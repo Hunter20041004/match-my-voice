@@ -1,0 +1,6 @@
+interface:
+  display_name: "用我的口吻寫"
+  short_description: "從你的文字或逐字稿建立個人口吻，並依回饋持續校準"
+  default_prompt: "請用 $match-my-voice 分析我的文字並建立個人口吻檔，再試寫一小段讓我校準。"
+policy:
+  allow_implicit_invocation: true
