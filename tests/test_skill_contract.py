@@ -55,7 +55,8 @@ class SourcePickerContractTests(unittest.TestCase):
         self.assertIn("this is an example, not a requirement", example,
                       "the example must not read as a hard dependency")
 
-    # Spec checks 4 and 5: every candidate says what it is about; unpicked files stay unread.
+    # Checks 4 and 5 of docs/superpowers/specs/2026-09-08-sample-sourcing-design.md:
+    # every candidate says what it is about; unpicked files stay unread.
     def test_candidate_list_shows_what_each_item_is_about(self):
         sources = read("references/sources.md")
         self.assertIn("## The candidate list", sources,

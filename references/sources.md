@@ -114,7 +114,7 @@ metadata, and unrelated files.
 
 Name only services with an available, connected tool — the specific service, not
 "your cloud". Search within the scope the person states, return a short candidate
-list with title, type, and date where available, and let them select exact items.
+list with title, date, and what it is about, and let them select exact items.
 A service choice does not authorize edits, messages, uploads, or publication. If
 discovery cannot be limited safely, use export or paste instead.
 
@@ -142,6 +142,10 @@ The "about" line comes from the cheapest source that works:
 1. The snippet the search already returned — use it when present, at no extra cost.
 2. Only when no snippet exists, read only the opening of that item.
 
+This opening peek happens before anything is picked, and it is bounded by what
+the about-line needs — a few opening lines, nothing more. It is not a licence
+to read further, and it ends the moment the about-line is written.
+
 This line replaces "who wrote it" as the thing the person judges by. Someone
 seeing "this one is about your internship motivation" knows immediately whether
 it is theirs and whether it fits.
@@ -153,7 +157,8 @@ person created. When it does not, list them anyway and rely on the "about" line
 plus the author confirmation below. Do not claim the filter was applied when it
 was not.
 
-The person then picks 3–5 items. **Items the person did not pick are not read.**
+The person then picks 3–5 items. Do not open, fetch, or read an item the person
+did not pick. **Items the person did not pick are not read.**
 
 ## Candidate review
 
