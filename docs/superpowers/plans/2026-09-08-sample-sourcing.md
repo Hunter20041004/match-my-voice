@@ -839,7 +839,7 @@ fails here, that is why — read the failure, do not re-run and hope.
 rm -rf tests/__pycache__
 git branch -d feat/task-driven-sourcing
 git push origin main
-gh api repos/Hunter20041004/match-my-voice/contents/references --jq '.[] | "\(.name)  \(.size) bytes"'
+gh api "repos/{owner}/{repo}/contents/references" --jq '.[] | "\(.name)  \(.size) bytes"'
 ```
 
 Expected: `sources.md` listed with a size larger than its previous 5,867 bytes.
