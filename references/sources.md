@@ -185,6 +185,19 @@ Summarise compactly before analysis:
 The person can remove an item or correct authorship here. Do not copy full
 private passages into the review when a title or their own label is enough.
 
+## When the samples are thin
+
+The picked items may turn out to be short, tabular, or mostly written by someone
+else. **Do not block the person.** Requiring more samples before producing
+anything is the barrier that makes people abandon the setup and never return.
+
+Instead: produce the profile, mark the profile provisional, and name the gap in
+plain words.
+
+> This one only holds up for short pieces — long writing may not match yet.
+
+Say what is missing. Do not claim coverage the samples do not support.
+
 ## When a source does not work
 
 Every failure ends in a working alternative, never a dead end.

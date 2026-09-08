@@ -100,6 +100,21 @@ class SourcePickerContractTests(unittest.TestCase):
         self.assertIn("ask it every time", confirm,
                       "the confirmation is not skippable")
 
+    # Spec check 7: thin samples still yield a profile, marked provisional with its gap.
+    def test_thin_samples_still_produce_a_marked_provisional_profile(self):
+        sources = read("references/sources.md")
+        self.assertIn("## When the samples are thin", sources,
+                      "sources.md needs a thin-samples section")
+        thin = flat(sources[sources.index("## When the samples are thin"):])
+        self.assertIn("do not block the person", thin,
+                      "thin samples must not stop the person from getting a profile")
+        self.assertIn("mark the profile provisional", thin,
+                      "a thin profile must be marked provisional")
+        self.assertIn("name the gap", thin,
+                      "the specific gap must be stated, not just the label")
+        self.assertIn("requiring more samples before producing anything is the barrier", thin,
+                      "the rationale for not blocking must be recorded")
+
     # Spec checks 2 and 3: the writing task is the filter; no task means ask context first.
     def test_sourcing_starts_from_the_writing_task(self):
         sources = read("references/sources.md")
