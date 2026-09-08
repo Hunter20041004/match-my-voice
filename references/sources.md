@@ -162,13 +162,15 @@ did not pick. **Items the person did not pick are not read.**
 
 ## Author confirmation
 
-Every automatic filter above can be wrong. Only the person knows. So before any
-analysis, ask exactly this, and ask it every time:
+Every automatic filter above can be wrong, and only the person knows the answer.
+**Ask it every time, before any analysis.**
 
 > Did you write all of these yourself?
 > Was any of them heavily edited by someone else or by AI?
 
-Their answer overrides every signal the skill inferred.
+Their answer overrides every signal the skill inferred, and it is what fills in
+the "likely author" line in the candidate review below. That review is for
+correcting individual items, not for asking the authorship question again.
 
 ## Candidate review
 
