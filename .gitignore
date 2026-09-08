@@ -4,3 +4,5 @@ profiles/
 samples/
 private/
 *.zip
+__pycache__/
+*.py[cod]

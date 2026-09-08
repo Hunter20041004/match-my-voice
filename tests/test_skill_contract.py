@@ -147,8 +147,10 @@ class SourcePickerContractTests(unittest.TestCase):
         # Repository URLs legitimately contain the owner's account name, so strip
         # URLs before looking for the maintainer's identity in prose.
         url = re.compile(r"https?://\S+")
+        # This file carries the search terms as literals, so it cannot scan itself.
+        self_path = Path(__file__).resolve().relative_to(ROOT).as_posix()
         for path in tracked:
-            if not path.endswith((".md", ".yaml", ".py")):
+            if path == self_path or not path.endswith((".md", ".yaml", ".py")):
                 continue
             prose = url.sub(" ", read(path))
             self.assertNotIn("hunter", flat(prose), f"maintainer identity leaked into {path}")
@@ -162,6 +164,19 @@ class SourcePickerContractTests(unittest.TestCase):
                       "README must show the one question the skill asks")
         for promise in ("讀得到", "跳過", "確認要分析哪些"):
             self.assertIn(promise, first_run, f"README first-run must mention: {promise}")
+
+    # Package hygiene: build artifacts never ship inside a cloned skill.
+    def test_python_build_artifacts_are_not_tracked(self):
+        tracked = subprocess.run(
+            ["git", "ls-files"], cwd=ROOT, capture_output=True, text=True, check=True
+        ).stdout.split()
+        for path in tracked:
+            self.assertNotIn("__pycache__", path, f"tracked build artifact: {path}")
+            self.assertFalse(path.endswith((".pyc", ".pyo")), f"tracked build artifact: {path}")
+
+        ignored = read(".gitignore").split()
+        for pattern in ("__pycache__/", "*.py[cod]"):
+            self.assertIn(pattern, ignored, f".gitignore must exclude {pattern}")
 
 
 if __name__ == "__main__":
