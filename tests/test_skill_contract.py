@@ -115,6 +115,21 @@ class SourcePickerContractTests(unittest.TestCase):
         self.assertIn("requiring more samples before producing anything is the barrier", thin,
                       "the rationale for not blocking must be recorded")
 
+    # Spec check 8: the profile has two layers and records which contexts it covers.
+    def test_profile_template_has_core_modes_and_coverage(self):
+        template = read("references/profile-template.md")
+        for field in ("Core:", "Context modes:", "Context coverage:"):
+            self.assertIn(field, template, f"profile template needs the field: {field}")
+        flat_template = flat(template)
+        self.assertIn("hold in every context", flat_template,
+                      "the core layer must be defined as context-independent")
+        self.assertIn("a formal version of the person is still that person",
+                      flat_template,
+                      "context modes must not be framed as conflicting with the voice")
+        self.assertIn("which contexts this profile has actually been built from",
+                      flat_template,
+                      "coverage must record the contexts actually evidenced")
+
     # Spec checks 2 and 3: the writing task is the filter; no task means ask context first.
     def test_sourcing_starts_from_the_writing_task(self):
         sources = read("references/sources.md")
