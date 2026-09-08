@@ -27,33 +27,33 @@ def flat(text):
 class SourcePickerContractTests(unittest.TestCase):
     longMessage = False
 
-    # Spec check 1: with no integrations, only core sources are offered.
-    def test_learn_mode_routes_to_a_source_picker_split_into_core_and_conditional(self):
+    # Spec check 1: with no connector, no service is offered or mentioned.
+    def test_two_paths_and_no_service_talk_without_a_connector(self):
         skill = read("SKILL.md")
         self.assertIn("references/sources.md", skill)
 
         sources = read("references/sources.md")
-        self.assertIn(
-            "Where would you like to get examples of how you naturally communicate?",
-            sources,
-        )
-        core_heading = "## Core sources"
-        conditional_heading = "## Conditional sources"
-        self.assertIn(core_heading, sources)
-        self.assertIn(conditional_heading, sources)
-        self.assertLess(
-            sources.index(core_heading),
-            sources.index(conditional_heading),
-            "core sources must be presented before conditional ones",
-        )
+        for heading in ("## Capability detection", "## Two paths",
+                        "### Path A — from a connected service",
+                        "### Path B — supplied by the person"):
+            self.assertIn(heading, sources, f"sources.md needs {heading}")
 
-        core_block = sources[sources.index(core_heading):sources.index(conditional_heading)]
-        for always_available in ("This conversation", "Paste text", "Answer a few simple questions"):
-            self.assertIn(always_available, core_block, always_available)
+        flat_sources = flat(sources)
+        self.assertIn("do not mention path a, and do not ask about it", flat_sources,
+                      "with no connector the service path must not be raised at all")
+        self.assertIn("ask which of the two paths", flat_sources,
+                      "with a connector, offer the two paths once")
+        for supplied in ("paste text", "upload", "this conversation",
+                         "answer a few simple questions"):
+            self.assertIn(supplied, flat_sources, f"path B must offer: {supplied}")
 
-        conditional_block = sources[sources.index(conditional_heading):]
-        for gated in ("Upload documents", "local files", "connected service", "Speech transcript"):
-            self.assertIn(gated, conditional_block, gated)
+        # The spec asks for one worked example, generic rules everywhere else.
+        self.assertIn("### Worked example — Google Drive", sources,
+                      "Path A needs one concrete worked example")
+        example = flat(sources[sources.index("### Worked example — Google Drive"):])
+        self.assertIn("google docs", example, "the example must name the document type")
+        self.assertIn("this is an example, not a requirement", example,
+                      "the example must not read as a hard dependency")
 
     # Spec checks 2 and 3: the writing task is the filter; no task means ask context first.
     def test_sourcing_starts_from_the_writing_task(self):

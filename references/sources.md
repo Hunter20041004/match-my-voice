@@ -28,33 +28,52 @@ anything else they name. One question only — do not run a setup questionnaire.
 ## Capability detection
 
 Check which tools, attachments, and connectors exist in this environment before
-listing anything. Capability detection is like a power strip that exposes only
+offering anything. Capability detection is like a power strip that exposes only
 the sockets actually wired up: it stops the skill promising access it does not
-have. Never list a source the host cannot provide.
+have.
 
-If detection is uncertain, do not claim the source is available. Offer a core
-source instead.
+If detection is uncertain, treat the capability as absent.
 
-## Core sources
+## Two paths
 
-Always available. They need no integration, so they are the offer of last
-resort and the fallback for everything below.
+**With no connected service available: do not mention Path A, and do not ask
+about it.** Go straight to Path B. Naming a service the host cannot reach only
+teaches the person to expect something that will not work.
 
-1. **This conversation** — the user's own messages in this thread.
-2. **Paste text** — the person pastes passages directly.
-3. **Answer a few simple questions** — guided questions when no writing exists.
+**With a connected service available:** ask which of the two paths they want.
+Ask once.
 
-## Conditional sources
+### Path A — from a connected service
 
-Offer each only when the host supports it, and name the specific service rather
-than the category.
+Search the connected service using the writing task as the query, then build the
+candidate list described below. Name the specific service, never "your cloud".
 
-4. **Upload documents** — only when the host accepts attachments and can extract text.
-5. **Choose local files or a folder** — only with filesystem access.
-6. **Choose from a connected service** — only when a connected tool for that
-   named service is available.
-7. **Speech transcript** — only when transcription is supported, or when the
-   user supplies a transcript themselves.
+### Worked example — Google Drive
+
+This is an example, not a requirement: every rule here is generic, and any
+connected service follows the same shape.
+
+With a Drive connector, search Drive for the writing task, keep Google Docs and
+uploaded text documents, and drop Sheets, Slides, and images. Where the
+connector exposes it, restrict to files the person owns. Show each candidate as
+title, modified date, and what it is about.
+
+Two things to say out loud rather than assume. A Drive connector reads through
+the Drive API, so it can reach Google Docs content that a synced desktop folder
+cannot — a synced `.gdoc` file on disk is only a pointer, not the text. And a
+Drive that has never been tidied will return badly named files, which is exactly
+why the candidate list carries an "about" line instead of trusting names.
+
+### Path B — supplied by the person
+
+Four ways in, all available without any integration:
+
+- **Paste text** — they paste passages directly.
+- **Upload documents** — when the host accepts attachments and can extract text.
+- **This conversation** — their own messages in this thread.
+- **Answer a few simple questions** — guided questions when no writing exists.
+
+Local files and speech transcripts also belong here when the host supports them.
 
 ## Per-source rules
 
