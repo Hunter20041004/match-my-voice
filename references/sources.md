@@ -160,6 +160,16 @@ was not.
 The person then picks 3–5 items. Do not open, fetch, or read an item the person
 did not pick. **Items the person did not pick are not read.**
 
+## Author confirmation
+
+Every automatic filter above can be wrong. Only the person knows. So before any
+analysis, ask exactly this, and ask it every time:
+
+> Did you write all of these yourself?
+> Was any of them heavily edited by someone else or by AI?
+
+Their answer overrides every signal the skill inferred.
+
 ## Candidate review
 
 Summarise compactly before analysis:

@@ -81,6 +81,25 @@ class SourcePickerContractTests(unittest.TestCase):
         self.assertIn("ownedbyme", listing.replace(" ", ""),
                       "owner filtering must be used when the field exists")
 
+    # Spec check 6: one explicit author confirmation always precedes analysis.
+    def test_author_confirmation_always_precedes_analysis(self):
+        sources = read("references/sources.md")
+        self.assertIn("## Author confirmation", sources,
+                      "sources.md needs an author confirmation section")
+        self.assertLess(
+            sources.index("## Author confirmation"),
+            sources.index("## Candidate review"),
+            "author confirmation comes before the review summary",
+        )
+        confirm = flat(sources[sources.index("## Author confirmation"):
+                               sources.index("## Candidate review")])
+        self.assertIn("did you write all of these yourself", confirm,
+                      "the confirmation question must be stated verbatim")
+        self.assertIn("heavily edited by someone else or by ai", confirm,
+                      "the confirmation must ask about outside editing")
+        self.assertIn("ask it every time", confirm,
+                      "the confirmation is not skippable")
+
     # Spec checks 2 and 3: the writing task is the filter; no task means ask context first.
     def test_sourcing_starts_from_the_writing_task(self):
         sources = read("references/sources.md")
