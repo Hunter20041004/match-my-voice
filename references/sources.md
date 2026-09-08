@@ -1,21 +1,29 @@
 # Choosing sample sources
 
-Use this when Learn mode starts and the user has not already supplied usable
-samples. Ask one question, offer only sources this host can actually reach, and
-let the person choose the exact material before any analysis.
+Use this when a voice profile is needed and the person has not already supplied
+usable samples. Do not open with a menu of places to look.
 
-## The one question
+## Start from the writing task
 
-> Where would you like to get examples of how you naturally communicate?
-
-Ask it once, in the user's language. Offer the available options as a short
-list. Do not present a setup questionnaire, and do not ask again once a source
-is chosen.
+Someone reaches this skill because they have something to write. Use what they
+are about to write as the filter for which samples to gather. This keeps the
+search small, and it guarantees the samples come from the same context as the
+piece being written — a profile built from application forms will not match a
+work email.
 
 When the request already names a source — pasted passages, an attached file, a
-named folder or service — skip the menu and go straight to that source. Work
-one step at a time: ask about a source, then about the items, never both at
-once.
+named folder or service — use that source and skip the questions below. Work one
+step at a time: settle the source, then the items, never both at once.
+
+## When there is no task yet
+
+If the person asks to learn their voice with nothing to write, ask one context
+question before looking for anything:
+
+> Which kind of writing do you want this for?
+
+Offer: job application, work email, social post, report or reflection. Accept
+anything else they name. One question only — do not run a setup questionnaire.
 
 ## Capability detection
 

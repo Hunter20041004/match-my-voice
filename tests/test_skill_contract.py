@@ -55,11 +55,32 @@ class SourcePickerContractTests(unittest.TestCase):
         for gated in ("Upload documents", "local files", "connected service", "Speech transcript"):
             self.assertIn(gated, conditional_block, gated)
 
+    # Spec checks 2 and 3: the writing task is the filter; no task means ask context first.
+    def test_sourcing_starts_from_the_writing_task(self):
+        sources = read("references/sources.md")
+        self.assertIn("## Start from the writing task", sources,
+                      "sources.md must lead with the writing task")
+        self.assertIn("## When there is no task yet", sources,
+                      "sources.md must handle a request with no stated task")
+
+        flat_sources = flat(sources)
+        self.assertNotIn(
+            "where would you like to get examples of how you naturally communicate?",
+            flat_sources,
+            "the old open-ended source question must be gone",
+        )
+        self.assertIn("use what they are about to write as the filter", flat_sources,
+                      "the task must be stated as the filter")
+        self.assertIn("ask one context question", flat_sources,
+                      "a missing task must trigger exactly one context question")
+        for offered in ("job application", "work email", "social post", "report"):
+            self.assertIn(offered, flat_sources, f"context options must include: {offered}")
+
     # Spec check 3: an explicitly named source skips the menu.
     def test_an_explicitly_named_source_skips_the_menu(self):
         sources = read("references/sources.md")
-        self.assertIn("skip the menu", flat(sources),
-                      "sources.md must say an explicitly named source skips the menu")
+        self.assertIn("skip the questions below", flat(sources),
+                      "an explicitly named source must skip the remaining questions")
         self.assertIn("one step at a time", flat(sources),
                       "sources.md must require one step at a time, not a questionnaire")
 
