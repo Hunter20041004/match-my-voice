@@ -187,7 +187,12 @@ private passages into the review when a title or their own label is enough.
 
 ## When the samples are thin
 
-The picked items may turn out to be short, tabular, or mostly written by someone
+Authorship problems are resolved first, under the Mixed authorship and Mostly
+AI-edited rules below; thinness is then judged on whatever material survives
+that pass.
+
+The picked items may turn out to be short, tabular — a document that is mostly
+table or form content, not a spreadsheet file — or mostly written by someone
 else. **Do not block the person.** Requiring more samples before producing
 anything is the barrier that makes people abandon the setup and never return.
 
