@@ -55,6 +55,31 @@ class SourcePickerContractTests(unittest.TestCase):
         self.assertIn("this is an example, not a requirement", example,
                       "the example must not read as a hard dependency")
 
+    # Spec checks 4 and 5: every candidate says what it is about; unpicked files stay unread.
+    def test_candidate_list_shows_what_each_item_is_about(self):
+        sources = read("references/sources.md")
+        self.assertIn("## The candidate list", sources,
+                      "sources.md needs a candidate list section")
+        listing = flat(sources[sources.index("## The candidate list"):])
+
+        self.assertIn("what this one is about", listing,
+                      "each candidate must say what it is about")
+        self.assertIn("do not show a fixed number", listing,
+                      "the list length must follow the search, not a constant")
+        self.assertIn("15", listing, "a default per-batch cap of 15 must be stated")
+        self.assertIn("do not silently truncate", listing,
+                      "an over-long list must be disclosed, not cut quietly")
+        self.assertIn("snippet the search already returned", listing,
+                      "summaries must reuse search snippets first")
+        self.assertIn("read only the opening of that item", listing,
+                      "falling back to reading must be limited to the opening")
+        self.assertIn("items the person did not pick are not read", listing,
+                      "unpicked items must never be read in full")
+        for dropped in ("spreadsheets", "slide decks", "images"):
+            self.assertIn(dropped, listing, f"candidate list must exclude: {dropped}")
+        self.assertIn("ownedbyme", listing.replace(" ", ""),
+                      "owner filtering must be used when the field exists")
+
     # Spec checks 2 and 3: the writing task is the filter; no task means ask context first.
     def test_sourcing_starts_from_the_writing_task(self):
         sources = read("references/sources.md")

@@ -125,15 +125,35 @@ Say plainly that this learns expression in text, not vocal identity. Keep
 transcription artifacts, fillers, and spoken rhythm separate from deliberate
 written preferences.
 
-## Narrowing to specific items
+## The candidate list
 
-Choosing a source authorizes the discovery needed to show candidates. It does
-not authorize analysing an entire account, drive, or folder.
+Choosing a path authorizes the discovery needed to show candidates. It does not
+authorize analysing an entire account, drive, or folder.
 
-After a source is chosen, list or describe the candidate items — title, type,
-and date where available — and ask the person to pick the exact material. State
-what will be read before reading it. Keep the list small; if discovery cannot be
-limited safely, fall back to export or paste.
+**Do not show a fixed number.** The search decides how many there are. When
+results run long, order by relevance and show at most 15 in one batch, then say
+how many more there are and offer either the next batch or a narrower
+description. Do not silently truncate.
+
+Show three things per row: **title**, **date**, and **what this one is about**.
+
+The "about" line comes from the cheapest source that works:
+
+1. The snippet the search already returned — use it when present, at no extra cost.
+2. Only when no snippet exists, read only the opening of that item.
+
+This line replaces "who wrote it" as the thing the person judges by. Someone
+seeing "this one is about your internship motivation" knows immediately whether
+it is theirs and whether it fits.
+
+Keep out spreadsheets, slide decks, and images. Documents only.
+
+When the service exposes an owner field such as `ownedByMe`, list only items the
+person created. When it does not, list them anyway and rely on the "about" line
+plus the author confirmation below. Do not claim the filter was applied when it
+was not.
+
+The person then picks 3–5 items. **Items the person did not pick are not read.**
 
 ## Candidate review
 
