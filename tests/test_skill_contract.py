@@ -130,6 +130,20 @@ class SourcePickerContractTests(unittest.TestCase):
                       flat_template,
                       "coverage must record the contexts actually evidenced")
 
+    # Spec check 9: a covered context skips re-sourcing; an uncovered one is narrow.
+    def test_second_use_checks_coverage_before_searching_again(self):
+        skill = flat(read("SKILL.md"))
+        self.assertIn("read its context coverage", skill,
+                      "SKILL.md must check coverage on a returning session")
+        self.assertIn("do not look for new samples", skill,
+                      "a covered context must not trigger a new search")
+        self.assertIn("only for that context", skill,
+                      "an uncovered context must trigger a narrow search, not a full redo")
+        self.assertIn("no samples exist for that context", skill,
+                      "the no-samples case must be handled explicitly")
+        self.assertIn("say so plainly rather than guessing silently", skill,
+                      "guessing at an uncovered context must be disclosed")
+
     # Spec checks 2 and 3: the writing task is the filter; no task means ask context first.
     def test_sourcing_starts_from_the_writing_task(self):
         sources = read("references/sources.md")

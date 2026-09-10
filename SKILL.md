@@ -26,7 +26,11 @@ With no filesystem, provide a downloadable or copyable profile and explain that 
 
 Start with the current conversation, supplied samples, and authorized relevant sources. Existing profiles are a starting point, not permission to search every connected account. No connector is required: pasted text works.
 
-When Learn mode starts and no usable samples have been supplied, follow [choosing sample sources](references/sources.md): ask once where the person wants to draw material from, list only sources this host can actually reach, and have them select the exact items before analysis.
+When samples are needed, follow [choosing sample sources](references/sources.md): use what the person is about to write as the filter, offer only what this host can reach, and have them select the exact items before analysis.
+
+When a profile already exists, read its context coverage first. If it covers the context being written now, do not look for new samples — write. If it does not, search only for that context and keep the core layer as it is. If no samples exist for that context, write using the core layer plus ordinary conventions for that kind of writing, and say so plainly rather than guessing silently:
+
+> You have no samples of this kind of writing, so I used ordinary conventions for it and kept only your core habits. Tell me what does not sound like you and I will record it.
 
 Prefer a few passages the person says feel natural, relevant to the intended writing context. If there are no samples, ask one simple question such as “Tell me about something you recently explained to a friend.” Build a provisional profile from the answer; ask the next question only if it resolves a real gap. Do not demand an arbitrary word count.
 
