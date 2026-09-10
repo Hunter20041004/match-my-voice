@@ -144,6 +144,16 @@ class SourcePickerContractTests(unittest.TestCase):
         self.assertIn("say so plainly rather than guessing silently", skill,
                       "guessing at an uncovered context must be disclosed")
 
+    # Spec check 10: profiles keep short excerpts as evidence, never whole sources.
+    def test_profiles_keep_excerpts_not_whole_documents(self):
+        skill = flat(read("SKILL.md"))
+        self.assertIn("keep short excerpts as evidence", skill,
+                      "SKILL.md must require excerpts as evidence")
+        self.assertIn("never store the full text of a source document", skill,
+                      "SKILL.md must forbid storing whole source documents")
+        self.assertIn("a profile that cannot show its evidence cannot be argued with", skill,
+                      "the reason for keeping excerpts must be recorded")
+
     # Spec checks 2 and 3: the writing task is the filter; no task means ask context first.
     def test_sourcing_starts_from_the_writing_task(self):
         sources = read("references/sources.md")
