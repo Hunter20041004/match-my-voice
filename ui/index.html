@@ -1,3 +1,169 @@
 <!doctype html>
-<html lang="zh-Hant"><head><meta charset="utf-8"><title>match-my-voice</title></head>
-<body><p>介面尚未建立。</p></body></html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>match-my-voice 口吻管理</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F5F5F7; --panel: #FFFFFF; --ink: #1D1D1F; --muted: #6E6E73;
+    --line: #D2D2D7; --accent: #0071E3; --accent-ink: #FFFFFF; --danger: #FF3B30;
+    --hover: #EBEBEF; --radius: 12px;
+    --shadow: 0 1px 3px rgba(0,0,0,.06);
+    --font: -apple-system, "SF Pro Text", "PingFang TC", "Inter", "Noto Sans TC", system-ui, sans-serif;
+    --mono: "SF Mono", Menlo, ui-monospace, monospace;
+    --ease: cubic-bezier(.2,.8,.2,1);
+  }
+  html { background: var(--bg); color: var(--ink); -webkit-font-smoothing: antialiased; }
+  body { font-family: var(--font) !important; }
+  h1, h2, h3 { font-weight: 600; letter-spacing: -0.01em; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+  .btn { border-radius: 8px; padding: 6px 12px; font-weight: 500; font-size: 13px; line-height: 20px; cursor: pointer;
+         transition: background-color .15s var(--ease), transform .1s var(--ease), opacity .15s var(--ease); }
+  .btn:active { transform: scale(.98); }
+  .btn:disabled { opacity: .45; cursor: default; transform: none; }
+  .btn-primary { background: var(--accent); color: var(--accent-ink); }
+  .btn-primary:hover:not(:disabled) { background: #0077ED; }
+  .btn-ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+  .btn-ghost:hover:not(:disabled) { background: var(--hover); }
+  .btn-danger { color: var(--danger); }
+  .persona { border: 1px solid transparent; border-radius: 10px; transition: background-color .15s var(--ease), border-color .15s var(--ease); }
+  .persona:hover { background: var(--hover); }
+  .persona.active { background: var(--hover); border-color: var(--line); }
+  .badge { font-size: 11px; line-height: 16px; padding: 1px 7px; border-radius: 999px; background: var(--bg); color: var(--muted); }
+  .badge-accent { background: rgba(0,113,227,.1); color: var(--accent); }
+  textarea, input { font-family: inherit; color: var(--ink); }
+  textarea.mono { font-family: var(--mono); font-size: 13px; line-height: 1.7; }
+  input, textarea { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+  input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,113,227,.15); outline: none; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  dialog::backdrop { background: rgba(0,0,0,.35); }
+  dialog[open] { animation: pop .18s var(--ease); }
+  @keyframes pop { from { opacity: 0; transform: scale(.97); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
+  .muted { color: var(--muted); }
+</style>
+</head>
+<body class="min-h-screen">
+<header class="px-6 pt-6 pb-4 max-w-[1400px] mx-auto">
+  <h1 class="text-2xl">口吻管理</h1>
+  <p class="text-sm muted mt-1">Agent 寫東西時讀這裡。改了就生效。</p>
+</header>
+
+<main class="px-6 pb-10 max-w-[1400px] mx-auto grid gap-4 lg:grid-cols-[280px_minmax(0,1fr)_360px]">
+  <!-- 角色 -->
+  <section class="panel p-4 self-start" aria-labelledby="h-personas">
+    <div class="flex items-center justify-between mb-3">
+      <h2 id="h-personas" class="text-base">角色</h2>
+      <button id="new-persona" class="btn btn-primary">新增</button>
+    </div>
+    <ul id="persona-list" class="space-y-1" role="listbox" aria-label="角色清單"></ul>
+    <p id="persona-empty" class="text-sm muted hidden">還沒有角色。按「新增」建第一個。</p>
+  </section>
+
+  <!-- 口吻檔 -->
+  <section class="panel p-4 min-w-0" aria-labelledby="h-profile">
+    <h2 id="h-profile" class="text-base mb-3">口吻檔 <span id="profile-name" class="font-normal muted"></span></h2>
+    <div id="profile-pane"><p class="text-sm muted">選一個角色。</p></div>
+  </section>
+
+  <!-- 學到的規則 -->
+  <section class="panel p-4 self-start" aria-labelledby="h-learned">
+    <h2 id="h-learned" class="text-base mb-3">學到的規則</h2>
+    <div id="learned-pane"><p class="text-sm muted">選一個角色。</p></div>
+  </section>
+</main>
+
+<dialog id="new-dialog" class="panel p-5 w-[min(92vw,420px)]">
+  <form method="dialog" id="new-form" class="space-y-4">
+    <h3 class="text-lg">新增角色</h3>
+    <label class="block text-sm">名稱
+      <input name="name" required class="mt-1 w-full px-3 py-2 text-base" placeholder="例如：徵才月行銷長" autocomplete="off">
+    </label>
+    <fieldset class="text-sm space-y-1">
+      <legend class="mb-1 muted">這是誰的口吻？</legend>
+      <label class="flex items-center gap-2"><input type="radio" name="type" value="self" checked class="accent-[var(--accent)]"> 我自己</label>
+      <label class="flex items-center gap-2"><input type="radio" name="type" value="role" class="accent-[var(--accent)]"> 我代表的某個角色或組織</label>
+    </fieldset>
+    <p id="new-error" class="text-sm hidden" style="color: var(--danger)" role="alert"></p>
+    <div class="flex justify-end gap-2 pt-1">
+      <button type="button" id="new-cancel" class="btn btn-ghost">取消</button>
+      <button type="submit" class="btn btn-primary">建立</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const state = { active: null, personas: [], selected: null };
+
+async function api(path, opts = {}) {
+  const res = await fetch(path, opts);
+  if (res.status === 204) return null;
+  const type = res.headers.get("content-type") || "";
+  const body = type.includes("json") ? await res.json() : await res.text();
+  if (!res.ok) throw new Error(body && body.error ? body.error : `HTTP ${res.status}`);
+  return body;
+}
+
+function escapeHtml(s) { return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+
+async function loadPersonas() {
+  const data = await api("/api/personas");
+  state.active = data.active; state.personas = data.personas;
+  if (!state.selected || !state.personas.some(p => p.id === state.selected)) state.selected = state.active || (state.personas[0] && state.personas[0].id) || null;
+  renderPersonas();
+  window.dispatchEvent(new CustomEvent("persona-selected", { detail: state.selected }));
+}
+
+function renderPersonas() {
+  const ul = $("#persona-list"); ul.innerHTML = "";
+  $("#persona-empty").classList.toggle("hidden", state.personas.length > 0);
+  for (const p of state.personas) {
+    const li = document.createElement("li");
+    li.className = "persona p-3 flex items-center justify-between gap-2 cursor-pointer" + (p.id === state.selected ? " active" : "");
+    li.setAttribute("role", "option"); li.setAttribute("aria-selected", p.id === state.selected); li.tabIndex = 0;
+    li.innerHTML = `
+      <div class="min-w-0">
+        <div class="font-medium truncate text-sm">${escapeHtml(p.name)}</div>
+        <div class="mt-1 flex gap-1"><span class="badge">${p.type === "role" ? "角色" : "本人"}</span>${p.id === state.active ? '<span class="badge badge-accent">目前使用</span>' : ""}</div>
+      </div>
+      <div class="flex gap-1 shrink-0">
+        ${p.id === state.active ? "" : `<button class="btn btn-ghost" data-act="activate" data-id="${p.id}">設為目前</button>`}
+        <button class="btn btn-ghost btn-danger" data-act="delete" data-id="${p.id}" aria-label="刪除 ${escapeHtml(p.name)}">刪除</button>
+      </div>`;
+    const select = () => { state.selected = p.id; renderPersonas(); window.dispatchEvent(new CustomEvent("persona-selected", { detail: p.id })); };
+    li.addEventListener("click", (e) => { if (!e.target.closest("button")) select(); });
+    li.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(); } });
+    ul.appendChild(li);
+  }
+}
+
+$("#persona-list").addEventListener("click", async (e) => {
+  const b = e.target.closest("button[data-act]"); if (!b) return;
+  const id = b.dataset.id;
+  if (b.dataset.act === "activate") { await api("/api/config", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ active: id }) }); await loadPersonas(); }
+  if (b.dataset.act === "delete") {
+    const p = state.personas.find(x => x.id === id);
+    if (confirm(`刪除「${p.name}」？口吻檔和學到的規則會一起刪，不能復原。`)) { await api(`/api/personas/${encodeURIComponent(id)}`, { method: "DELETE" }); await loadPersonas(); }
+  }
+});
+
+$("#new-persona").addEventListener("click", () => { $("#new-form").reset(); $("#new-error").classList.add("hidden"); $("#new-dialog").showModal(); $("#new-form").elements.name.focus(); });
+$("#new-cancel").addEventListener("click", () => $("#new-dialog").close());
+$("#new-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  try {
+    const created = await api("/api/personas", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ name: fd.get("name"), type: fd.get("type") }) });
+    $("#new-dialog").close(); state.selected = created.id; await loadPersonas();
+  } catch (err) { $("#new-error").textContent = err.message; $("#new-error").classList.remove("hidden"); }
+});
+
+loadPersonas().catch((err) => { $("#persona-empty").textContent = "讀取失敗：" + err.message; $("#persona-empty").classList.remove("hidden"); });
+</script>
+</body>
+</html>
