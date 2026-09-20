@@ -344,6 +344,20 @@ class PersonaContractTests(unittest.TestCase):
         for t in ('"self"', '"role"'):
             self.assertIn(t, read("references/profile-template.md"), f"type value {t}")
 
+    # Check 2: a role persona asks whether samples fit the role, not who wrote them.
+    def test_role_personas_ask_about_representativeness(self):
+        sources = read("references/sources.md")
+        section = flat(sources[sources.index("## Author confirmation"):
+                               sources.index("## Candidate review")])
+        self.assertIn("for a self persona", section)
+        self.assertIn("for a role persona", section)
+        self.assertIn("is this what the role should sound like", section,
+                      "the role question must be stated verbatim")
+        self.assertIn("written by several people is expected", section,
+                      "multiple authors are normal for a role")
+        self.assertIn("did you write all of these yourself", section,
+                      "the self question must survive")
+
 
 if __name__ == "__main__":
     unittest.main()
