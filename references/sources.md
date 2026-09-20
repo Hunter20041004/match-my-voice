@@ -1,52 +1,80 @@
 # Choosing sample sources
 
-Use this when Learn mode starts and the user has not already supplied usable
-samples. Ask one question, offer only sources this host can actually reach, and
-let the person choose the exact material before any analysis.
+Use this when a voice profile is needed and the person has not already supplied
+usable samples. Do not open with a menu of places to look.
 
-## The one question
+## Start from the writing task
 
-> Where would you like to get examples of how you naturally communicate?
-
-Ask it once, in the user's language. Offer the available options as a short
-list. Do not present a setup questionnaire, and do not ask again once a source
-is chosen.
+Someone reaches this skill because they have something to write. Use what they
+are about to write as the filter for which samples to gather. This keeps the
+search small, and it guarantees the samples come from the same context as the
+piece being written — a profile built from application forms will not match a
+work email.
 
 When the request already names a source — pasted passages, an attached file, a
-named folder or service — skip the menu and go straight to that source. Work
-one step at a time: ask about a source, then about the items, never both at
-once.
+named folder or service — use that source and skip the path question below. If
+no task has been stated yet, still ask the context question first. Work one
+step at a time: settle the source, then the items, never both at once.
+
+## When there is no task yet
+
+If the person asks to learn their voice with nothing to write, ask one context
+question before looking for anything:
+
+> Which kind of writing do you want this for?
+
+Offer: job application, work email, social post, report or reflection. Accept
+anything else they name. One question only — do not run a setup questionnaire.
 
 ## Capability detection
 
 Check which tools, attachments, and connectors exist in this environment before
-listing anything. Capability detection is like a power strip that exposes only
+offering anything. Capability detection is like a power strip that exposes only
 the sockets actually wired up: it stops the skill promising access it does not
-have. Never list a source the host cannot provide.
+have.
 
-If detection is uncertain, do not claim the source is available. Offer a core
-source instead.
+If detection is uncertain, treat the capability as absent.
 
-## Core sources
+## Two paths
 
-Always available. They need no integration, so they are the offer of last
-resort and the fallback for everything below.
+**With no connected service available: do not mention Path A, and do not ask
+about it.** Go straight to Path B. Naming a service the host cannot reach only
+teaches the person to expect something that will not work.
 
-1. **This conversation** — the user's own messages in this thread.
-2. **Paste text** — the person pastes passages directly.
-3. **Answer a few simple questions** — guided questions when no writing exists.
+**With a connected service available:** ask which of the two paths they want.
+Ask once.
 
-## Conditional sources
+### Path A — from a connected service
 
-Offer each only when the host supports it, and name the specific service rather
-than the category.
+Search the connected service using the writing task as the query, then build the
+candidate list described below. Name the specific service, never "your cloud".
 
-4. **Upload documents** — only when the host accepts attachments and can extract text.
-5. **Choose local files or a folder** — only with filesystem access.
-6. **Choose from a connected service** — only when a connected tool for that
-   named service is available.
-7. **Speech transcript** — only when transcription is supported, or when the
-   user supplies a transcript themselves.
+### Worked example — Google Drive
+
+This is an example, not a requirement: every rule here is generic, and any
+connected service follows the same shape.
+
+With a Drive connector, search Drive for the writing task, keep Google Docs and
+uploaded text documents, and drop Sheets, Slides, and images. Where the
+connector exposes it, restrict to files the person owns. Show each candidate as
+title, modified date, and what it is about.
+
+Two things to say out loud rather than assume. A Drive connector reads through
+the Drive API, so it can reach Google Docs content that a synced desktop folder
+cannot — a synced `.gdoc` file on disk is only a pointer, not the text. And a
+Drive that has never been tidied will return badly named files, which is exactly
+why the candidate list carries an "about" line instead of trusting names.
+
+### Path B — supplied by the person
+
+Four ways in, all available without a connected service:
+
+- **Paste text** — they paste passages directly.
+- **Upload documents** — when the host accepts attachments and can extract text.
+- **This conversation** — their own messages in this thread.
+- **Answer a few simple questions** — guided questions when no writing exists.
+
+Local files and speech transcripts also belong here when the host supports them.
 
 ## Per-source rules
 
@@ -87,7 +115,7 @@ metadata, and unrelated files.
 
 Name only services with an available, connected tool — the specific service, not
 "your cloud". Search within the scope the person states, return a short candidate
-list with title, type, and date where available, and let them select exact items.
+list with title, date, and what it is about, and let them select exact items.
 A service choice does not authorize edits, messages, uploads, or publication. If
 discovery cannot be limited safely, use export or paste instead.
 
@@ -98,15 +126,54 @@ Say plainly that this learns expression in text, not vocal identity. Keep
 transcription artifacts, fillers, and spoken rhythm separate from deliberate
 written preferences.
 
-## Narrowing to specific items
+## The candidate list
 
-Choosing a source authorizes the discovery needed to show candidates. It does
-not authorize analysing an entire account, drive, or folder.
+Choosing a path authorizes the discovery needed to show candidates. It does not
+authorize analysing an entire account, drive, or folder.
 
-After a source is chosen, list or describe the candidate items — title, type,
-and date where available — and ask the person to pick the exact material. State
-what will be read before reading it. Keep the list small; if discovery cannot be
-limited safely, fall back to export or paste.
+**Do not show a fixed number.** The search decides how many there are. When
+results run long, order by relevance and show at most 15 in one batch, then say
+how many more there are and offer either the next batch or a narrower
+description. Do not silently truncate.
+
+Show three things per row: **title**, **date**, and **what this one is about**.
+
+The "about" line comes from the cheapest source that works:
+
+1. The snippet the search already returned — use it when present, at no extra cost.
+2. Only when no snippet exists, read only the opening of that item.
+
+This opening peek happens before anything is picked, and it is bounded by what
+the about-line needs — a few opening lines, nothing more. It is not a licence
+to read further, and it ends the moment the about-line is written.
+
+This line replaces "who wrote it" as the thing the person judges by. Someone
+seeing "this one is about your internship motivation" knows immediately whether
+it is theirs and whether it fits.
+
+Keep out spreadsheets, slide decks, and images. Documents only.
+
+When the service exposes an owner field such as `ownedByMe`, list only items the
+person created. When it does not, list them anyway and rely on the "about" line
+plus the author confirmation below. Do not claim the filter was applied when it
+was not.
+
+The person then picks 3–5 items. Do not open, fetch, or read an item the person
+did not pick. **Items the person did not pick are not read.**
+
+## Author confirmation
+
+Every automatic filter above can be wrong, and only the person knows the answer.
+**Ask it every time, before any analysis.**
+
+> Did you write all of these yourself?
+> Was any of them heavily edited by someone else or by AI?
+
+Their answer overrides every signal the skill inferred, and it is what fills in
+the "likely author" line in the candidate review below. That review is for
+correcting individual items, not for asking the authorship question again. If
+the answer is no, follow the Mixed authorship and Mostly AI-edited rules under
+"When a source does not work" below.
 
 ## Candidate review
 
@@ -120,6 +187,24 @@ Summarise compactly before analysis:
 
 The person can remove an item or correct authorship here. Do not copy full
 private passages into the review when a title or their own label is enough.
+
+## When the samples are thin
+
+Authorship problems are resolved first, under the Mixed authorship and Mostly
+AI-edited rules below; thinness is then judged on whatever material survives
+that pass.
+
+The picked items may turn out to be short, tabular — a document that is mostly
+table or form content, not a spreadsheet file — or mostly written by someone
+else. **Do not block the person.** Requiring more samples before producing
+anything is the barrier that makes people abandon the setup and never return.
+
+Instead: produce the profile, mark the profile provisional, and name the gap in
+plain words.
+
+> This one only holds up for short pieces — long writing may not match yet.
+
+Say what is missing. Do not claim coverage the samples do not support.
 
 ## When a source does not work
 
