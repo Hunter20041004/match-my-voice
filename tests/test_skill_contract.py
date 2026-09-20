@@ -1,7 +1,9 @@
 """Contract tests for the Match My Voice skill package.
 
-Each test traces to a numbered behavioural check in
-docs/superpowers/specs/2026-09-05-source-picker-design.md ("Verification").
+Each test traces to a numbered acceptance check in
+docs/superpowers/specs/2026-09-08-sample-sourcing-design.md ("驗收檢查"),
+except the package-hygiene tests, which guard the privacy boundary described
+in docs/superpowers/specs/2026-09-05-source-picker-design.md.
 
 These check that the skill *document* states the required behaviour. They
 cannot prove an agent follows it — the multi-person blind test in
