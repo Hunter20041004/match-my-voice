@@ -378,6 +378,18 @@ class PersonaContractTests(unittest.TestCase):
         self.assertIn(line_format, fb, "the learned.md line format must be stated exactly")
         self.assertIn("revoking flips the status word in place", f)
 
+    # Checks 4 and 5: writing applies active learned rules; refining follows feedback.md.
+    def test_write_reads_learned_rules_and_refine_routes_to_feedback(self):
+        skill = read("SKILL.md")
+        self.assertIn("references/feedback.md", skill)
+        f = flat(skill)
+        self.assertIn("then every `[active]` line of `learned.md`", f,
+                      "Write must apply active learned rules")
+        self.assertIn("skip `[revoked]` lines", f)
+        self.assertIn("pastes back an edited version", f,
+                      "Refine must recognise the paste-back case")
+        self.assertIn("follow [learning from edits](references/feedback.md)", f)
+
 
 if __name__ == "__main__":
     unittest.main()

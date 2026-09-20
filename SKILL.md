@@ -11,7 +11,7 @@ Help each user write in their own voice, grounded in their own samples. The dist
 
 - **Learn:** no suitable profile exists, or the user asks to analyze their voice. Gather samples, infer patterns, calibrate, then save.
 - **Write:** a relevant profile exists. Read it, check its context coverage for the current task, draft, and check facts and voice.
-- **Refine:** the user corrects a draft or supplies new samples. Apply the correction now and update only supported profile rules.
+- **Refine:** the user corrects a draft in the conversation, supplies new samples, or pastes back an edited version of a draft this skill produced. For the paste-back case follow [learning from edits](references/feedback.md). Otherwise apply the correction now and update only supported profile rules.
 - A request to analyze voice alone does not require drafting a full article. A request to write should not turn into a long onboarding interview when usable samples already exist.
 
 ## Find and separate personal profiles
@@ -58,7 +58,7 @@ Save using [profile structure](references/profile-template.md), omitting unsuppo
 
 ## Write using the profile
 
-Read the appropriate person's profile, language, context mode, and current instructions. Current explicit instructions override historical preferences.
+Read the active persona's `VOICE.md`, then every `[active]` line of `learned.md`; skip `[revoked]` lines. Learned rules are applied on top of the profile. Read the language, context mode, and current instructions. Current explicit instructions override historical preferences.
 
 Extract the content that must survive: facts, names, numbers, uncertainty, commitments, links, audience, and format limits. If drafting from sparse notes, do not invent experiences or results to fill gaps.
 
@@ -68,7 +68,7 @@ Compare the draft with the source for factual fidelity, then with the profile fo
 
 ## Learn from feedback
 
-Apply edits immediately. Persist an explicit reusable preference, scoped to its language and context. For ambiguous edits, record a tentative observation rather than a global rule. A single deletion may concern content, length, or audience rather than voice.
+For edits made in the conversation, apply them immediately. For a pasted-back edited draft, the comparison, classification, and asking step live in [learning from edits](references/feedback.md); this section covers what to persist once the person has answered. Persist an explicit reusable preference, scoped to its language and context. For ambiguous edits, record a tentative observation rather than a global rule. A single deletion may concern content, length, or audience rather than voice.
 
 When preferences change, supersede the old rule and briefly record why. Accepted AI text is a reviewed example, not original human corpus. Do not infer which individual rule caused approval or invent confidence percentages.
 
