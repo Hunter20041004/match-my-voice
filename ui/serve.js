@@ -94,6 +94,17 @@ export function deletePersona(home, id) {
   return true;
 }
 
+export function getConfig(home) { ensureHome(home); return readJson(join(home, "config.json"), { active: null }); }
+
+export function setActive(home, id) {
+  ensureHome(home);
+  if (id !== null && (!ID_RE.test(String(id)) || !existsSync(join(home, "profiles", id, "persona.json")))) {
+    throw Object.assign(new Error("no such persona"), { status: 404 });
+  }
+  writeFileSync(join(home, "config.json"), JSON.stringify({ active: id }, null, 2));
+  return { active: id };
+}
+
 function send(res, status, body, type = "application/json; charset=utf-8") {
   res.writeHead(status, { "content-type": type });
   res.end(typeof body === "string" ? body : JSON.stringify(body));
@@ -106,6 +117,8 @@ export function createApp(home) {
     try {
       if (req.method === "GET" && url.pathname === "/") return send(res, 200, page(), "text/html; charset=utf-8");
       if (req.method === "GET" && url.pathname === "/api/personas") return send(res, 200, listPersonas(home));
+      if (url.pathname === "/api/config" && req.method === "GET") return send(res, 200, getConfig(home));
+      if (url.pathname === "/api/config" && req.method === "PUT") return send(res, 200, setActive(home, (await readBody(req)).active ?? null));
       if (req.method === "POST" && url.pathname === "/api/personas") {
         const body = await readBody(req);
         return send(res, 201, createPersona(home, body));
