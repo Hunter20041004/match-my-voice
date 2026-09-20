@@ -177,15 +177,15 @@ class SourcePickerContractTests(unittest.TestCase):
         for offered in ("job application", "work email", "social post", "report"):
             self.assertIn(offered, flat_sources, f"context options must include: {offered}")
 
-    # Spec check 3: an explicitly named source skips the menu.
+    # 2026-09-05 spec, Verification check 3: an explicitly named source skips the menu.
     def test_an_explicitly_named_source_skips_the_menu(self):
         sources = read("references/sources.md")
-        self.assertIn("skip the questions below", flat(sources),
-                      "an explicitly named source must skip the remaining questions")
+        self.assertIn("skip the path question below", flat(sources),
+                      "an explicitly named source must skip the path question, not the context question")
         self.assertIn("one step at a time", flat(sources),
                       "sources.md must require one step at a time, not a questionnaire")
 
-    # Spec check 5: a chosen source must narrow to user-selected items before analysis.
+    # 2026-09-05 spec, Verification check 5: a chosen source must narrow to user-selected items before analysis.
     def test_candidates_are_selected_and_reviewed_before_analysis(self):
         sources = read("references/sources.md")
         self.assertIn("## Candidate review", sources,
@@ -204,7 +204,7 @@ class SourcePickerContractTests(unittest.TestCase):
         self.assertIn("do not copy full private passages", flat(review),
                       "review must not reproduce private passages")
 
-    # Spec check 6: an unavailable source produces a working fallback.
+    # 2026-09-05 spec, Verification check 6: an unavailable source produces a working fallback.
     def test_every_failure_mode_has_a_named_fallback(self):
         sources = read("references/sources.md")
         self.assertIn("## When a source does not work", sources,
@@ -225,7 +225,7 @@ class SourcePickerContractTests(unittest.TestCase):
         self.assertIn("verify the search or path worked", fallback,
                       "empty results must be verified before concluding nothing exists")
 
-    # Spec check 2: a connected service is named without implying unrestricted access.
+    # 2026-09-05 spec, Verification check 2: a connected service is named without implying unrestricted access.
     def test_a_connected_service_is_scoped_and_read_only(self):
         sources = flat(read("references/sources.md"))
         self.assertIn("name only services with an available, connected tool", sources,
@@ -237,7 +237,7 @@ class SourcePickerContractTests(unittest.TestCase):
         for never_swept in ("home directory", "downloads", "credentials"):
             self.assertIn(never_swept, sources, f"must exclude: {never_swept}")
 
-    # Spec check 4: only the person's own words become samples.
+    # 2026-09-05 spec, Verification check 4: only the person's own words become samples.
     def test_core_sources_filter_out_text_the_person_did_not_write(self):
         sources = flat(read("references/sources.md"))
         for excluded in ("assistant text", "quoted material", "copied templates",
@@ -248,7 +248,7 @@ class SourcePickerContractTests(unittest.TestCase):
         self.assertIn("provisional", sources,
                       "guided answers must be marked provisional")
 
-    # Spec check 8: no raw sample or generated profile is tracked by the repository.
+    # 2026-09-05 spec, Verification check 8: no raw sample or generated profile is tracked by the repository.
     def test_no_personal_sample_or_profile_is_tracked(self):
         tracked = subprocess.run(
             ["git", "ls-files"], cwd=ROOT, capture_output=True, text=True, check=True
@@ -271,14 +271,28 @@ class SourcePickerContractTests(unittest.TestCase):
         url = re.compile(r"https?://\S+")
         # This file carries the search terms as literals, so it cannot scan itself.
         self_path = Path(__file__).resolve().relative_to(ROOT).as_posix()
+
+        # The private terms themselves must never live in a tracked file, or this
+        # test would repeat the exact leak it exists to catch. They are kept in a
+        # gitignored local file instead; "hunter" is the public GitHub account
+        # name, not private, so it is safe to keep as a built-in term.
+        forbidden_terms = ["hunter"]
+        forbidden_terms_path = ROOT / "private" / "forbidden-terms.txt"
+        if forbidden_terms_path.exists():
+            for line in forbidden_terms_path.read_text(encoding="utf-8").splitlines():
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                forbidden_terms.append(line)
+
         for path in tracked:
             if path == self_path or not path.endswith((".md", ".yaml", ".py")):
                 continue
-            prose = url.sub(" ", read(path))
-            self.assertNotIn("hunter", flat(prose), f"maintainer identity leaked into {path}")
-            self.assertNotIn("曾尉庭", prose, f"maintainer identity leaked into {path}")
+            prose = flat(url.sub(" ", read(path)))
+            for term in forbidden_terms:
+                self.assertNotIn(term.casefold(), prose,
+                                 f"maintainer identity leaked into {path}")
 
-    # Spec scope: the README explains the new first-run behaviour.
     # Spec scope: the README describes the task-driven first run.
     def test_readme_documents_the_task_driven_first_run(self):
         readme = read("README.md")

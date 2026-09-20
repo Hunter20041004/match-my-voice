@@ -18,7 +18,7 @@ Help each user write in their own voice, grounded in their own samples. The dist
 
 Use the user-provided profile or path first. Otherwise, on a local filesystem check `~/.config/match-my-voice/profiles/default/VOICE.md`. Create it only after identifying whose voice is being captured. If it belongs to someone else, keep it separate and select or create a clearly named profile. Never merge different people's samples.
 
-For multiple people, languages, or contexts, use distinct named profiles under `~/.config/match-my-voice/profiles/`. Do not derive file paths directly from unchecked names. A suitable existing profile may contain audience-specific modes rather than requiring a file per mode.
+For multiple people, languages, or contexts, use distinct named profiles under `~/.config/match-my-voice/profiles/`. Do not derive file paths directly from unchecked names. A suitable existing profile may contain context modes rather than requiring a file per mode.
 
 With no filesystem, provide a downloadable or copyable profile and explain that the user must supply it in future sessions. Do not promise automatic cross-session memory. Never put personal profiles or raw samples inside the installed skill folder or a shared repository. Saving locally does not mean the AI host processes the text offline.
 
@@ -56,7 +56,7 @@ Save using [profile structure](references/profile-template.md), omitting unsuppo
 
 ## Write using the profile
 
-Read the appropriate person's profile, language, audience mode, and current instructions. Current explicit instructions override historical preferences.
+Read the appropriate person's profile, language, context mode, and current instructions. Current explicit instructions override historical preferences.
 
 Extract the content that must survive: facts, names, numbers, uncertainty, commitments, links, audience, and format limits. If drafting from sparse notes, do not invent experiences or results to fill gaps.
 

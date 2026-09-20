@@ -12,7 +12,8 @@ piece being written — a profile built from application forms will not match a
 work email.
 
 When the request already names a source — pasted passages, an attached file, a
-named folder or service — use that source and skip the questions below. Work one
+named folder or service — use that source and skip the path question below. If
+no task has been stated yet, still ask the context question first. Work one
 step at a time: settle the source, then the items, never both at once.
 
 ## When there is no task yet
@@ -66,7 +67,7 @@ why the candidate list carries an "about" line instead of trusting names.
 
 ### Path B — supplied by the person
 
-Four ways in, all available without any integration:
+Four ways in, all available without a connected service:
 
 - **Paste text** — they paste passages directly.
 - **Upload documents** — when the host accepts attachments and can extract text.
@@ -170,7 +171,9 @@ Every automatic filter above can be wrong, and only the person knows the answer.
 
 Their answer overrides every signal the skill inferred, and it is what fills in
 the "likely author" line in the candidate review below. That review is for
-correcting individual items, not for asking the authorship question again.
+correcting individual items, not for asking the authorship question again. If
+the answer is no, follow the Mixed authorship and Mostly AI-edited rules under
+"When a source does not work" below.
 
 ## Candidate review
 
