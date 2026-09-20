@@ -186,6 +186,40 @@ window.addEventListener("persona-selected", async (e) => {
 });
 window.addEventListener("beforeunload", (e) => { if (profileDirty) { e.preventDefault(); e.returnValue = ""; } });
 
+window.addEventListener("persona-selected", async (e) => {
+  const id = e.detail; const pane = $("#learned-pane");
+  if (!id) { pane.innerHTML = `<p class="text-sm muted">選一個角色。</p>`; return; }
+  await renderLearned(id);
+});
+
+async function renderLearned(id) {
+  const pane = $("#learned-pane");
+  const { entries } = await api(`/api/personas/${encodeURIComponent(id)}/learned`);
+  const rules = entries.filter(x => x.status !== "unparsed");
+  if (!rules.length) { pane.innerHTML = `<p class="text-sm muted">還沒學到東西。把改好的草稿貼回給 Agent，它會問你要不要記下來。</p>`; return; }
+  pane.innerHTML = `<ul class="space-y-2">${rules.map(x => `
+    <li class="rounded-[10px] border p-3 transition-opacity ${x.status === "revoked" ? "opacity-50" : ""}" style="border-color: var(--line)">
+      <div class="text-xs muted mb-1">${x.date} · ${escapeHtml(x.context)}${x.status === "revoked" ? " · 已撤銷" : ""}</div>
+      <div class="text-sm leading-relaxed" data-rule="${x.index}">${escapeHtml(x.rule)}</div>
+      <div class="text-xs muted mt-1">來源：${escapeHtml(x.source)}</div>
+      <div class="flex gap-1 mt-2">
+        <button class="btn btn-ghost" data-act="edit" data-i="${x.index}">改字</button>
+        <button class="btn btn-ghost ${x.status === "active" ? "btn-danger" : ""}" data-act="toggle" data-i="${x.index}" data-next="${x.status === "active" ? "revoked" : "active"}">${x.status === "active" ? "撤銷" : "恢復"}</button>
+      </div>
+    </li>`).join("")}</ul>`;
+  pane.onclick = async (ev) => {
+    const b = ev.target.closest("button[data-act]"); if (!b) return;
+    const i = Number(b.dataset.i);
+    if (b.dataset.act === "toggle") { await api(`/api/personas/${encodeURIComponent(id)}/learned/${i}`, { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ status: b.dataset.next }) }); await renderLearned(id); }
+    if (b.dataset.act === "edit") {
+      const cur = pane.querySelector(`[data-rule="${i}"]`).textContent;
+      const next = prompt("改成：", cur); if (next === null || next.trim() === cur) return;
+      try { await api(`/api/personas/${encodeURIComponent(id)}/learned/${i}`, { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ rule: next }) }); await renderLearned(id); }
+      catch (err) { alert("沒存成：" + err.message); }
+    }
+  };
+}
+
 loadPersonas().catch((err) => { $("#persona-empty").textContent = "讀取失敗：" + err.message; $("#persona-empty").classList.remove("hidden"); });
 </script>
 </body>
