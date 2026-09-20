@@ -117,6 +117,43 @@ async function readText(req) {
   return Buffer.concat(chunks).toString("utf8");
 }
 
+const LINE_RE = /^- \[(active|revoked)\] (\d{4}-\d{2}-\d{2}) \| ([^|]*?) \| ([^|]*?) \| source: (.*)$/;
+
+export function parseLearned(text) {
+  const lines = text.split("\n");
+  if (lines.length && lines[lines.length - 1] === "") lines.pop();
+  return lines.map((line, index) => {
+    const m = line.match(LINE_RE);
+    if (!m) return { index, status: "unparsed", raw: line };
+    return { index, status: m[1], date: m[2], context: m[3].trim(), rule: m[4].trim(), source: m[5].trim() };
+  });
+}
+
+export function serializeLearned(entries) {
+  const out = entries.map((e) => e.status === "unparsed" ? e.raw : `- [${e.status}] ${e.date} | ${e.context} | ${e.rule} | source: ${e.source}`);
+  return out.join("\n") + "\n";
+}
+
+export function patchLearned(home, id, index, change) {
+  const dir = personaDir(home, id);
+  if (!dir) throw Object.assign(new Error("not found"), { status: 404 });
+  const entries = parseLearned(readFileSync(join(dir, "learned.md"), "utf8"));
+  const e = entries[index];
+  if (!e) throw Object.assign(new Error("no such entry"), { status: 404 });
+  if (e.status === "unparsed") throw Object.assign(new Error("line is not in the rule format"), { status: 400 });
+  if ("status" in change) {
+    if (change.status !== "active" && change.status !== "revoked") throw Object.assign(new Error("status must be active or revoked"), { status: 400 });
+    e.status = change.status;
+  }
+  if ("rule" in change) {
+    const r = String(change.rule).trim();
+    if (!r || r.includes("|") || r.includes("\n")) throw Object.assign(new Error("rule must be one line without |"), { status: 400 });
+    e.rule = r;
+  }
+  writeFileSync(join(dir, "learned.md"), serializeLearned(entries));
+  return { entries };
+}
+
 function send(res, status, body, type = "application/json; charset=utf-8") {
   res.writeHead(status, { "content-type": type });
   res.end(typeof body === "string" ? body : JSON.stringify(body));
@@ -141,6 +178,13 @@ export function createApp(home) {
         if (!dir) return send(res, 404, { error: "not found" });
         if (req.method === "GET") return send(res, 200, readFileSync(join(dir, "VOICE.md"), "utf8"), "text/markdown; charset=utf-8");
         if (req.method === "PUT") { writeFileSync(join(dir, "VOICE.md"), await readText(req)); return send(res, 200, { ok: true }); }
+      }
+      const learned = url.pathname.match(/^\/api\/personas\/([^/]+)\/learned(?:\/(\d+))?$/);
+      if (learned) {
+        const dir = personaDir(home, decodeURIComponent(learned[1]));
+        if (!dir) return send(res, 404, { error: "not found" });
+        if (req.method === "GET" && learned[2] === undefined) return send(res, 200, { entries: parseLearned(readFileSync(join(dir, "learned.md"), "utf8")) });
+        if (req.method === "PATCH" && learned[2] !== undefined) return send(res, 200, patchLearned(home, decodeURIComponent(learned[1]), Number(learned[2]), await readBody(req)));
       }
       const del = url.pathname.match(/^\/api\/personas\/([^/]+)$/);
       if (req.method === "DELETE" && del) {
