@@ -1,9 +1,12 @@
 """Contract tests for the Match My Voice skill package.
 
-Each test traces to a numbered acceptance check in
-docs/superpowers/specs/2026-09-08-sample-sourcing-design.md ("驗收檢查"),
-except the package-hygiene tests, which guard the privacy boundary described
-in docs/superpowers/specs/2026-09-05-source-picker-design.md.
+Each test traces to a numbered acceptance check in one of:
+docs/superpowers/specs/2026-09-08-sample-sourcing-design.md ("驗收檢查") for
+SourcePickerContractTests, and
+docs/superpowers/specs/2026-09-20-personas-and-feedback-design.md for
+PersonaContractTests — except the package-hygiene tests, which guard the privacy
+boundary described in docs/superpowers/specs/2026-09-05-source-picker-design.md.
+The UI server has its own tests under tests/ui/ (node --test tests/ui/*.test.js).
 
 These check that the skill *document* states the required behaviour. They
 cannot prove an agent follows it — the multi-person blind test in
@@ -389,6 +392,16 @@ class PersonaContractTests(unittest.TestCase):
         self.assertIn("pastes back an edited version", f,
                       "Refine must recognise the paste-back case")
         self.assertIn("follow [learning from edits](references/feedback.md)", f)
+
+    # README explains personas, the feedback loop, and how to open the page.
+    def test_readme_documents_personas_feedback_and_ui(self):
+        readme = read("README.md")
+        self.assertIn("## 管理介面", readme)
+        ui = readme[readme.index("## 管理介面"):]
+        self.assertIn("node ui/serve.js", ui)
+        self.assertIn("不會呼叫任何 AI", ui)
+        for phrase in ("角色", "貼回", "要不要記下來", "撤銷"):
+            self.assertIn(phrase, readme, f"README must mention: {phrase}")
 
 
 if __name__ == "__main__":
