@@ -358,6 +358,26 @@ class PersonaContractTests(unittest.TestCase):
         self.assertIn("did you write all of these yourself", section,
                       "the self question must survive")
 
+    # Checks 3 and 4: learn only voice-class edits, and only after asking.
+    def test_feedback_reference_learns_only_voice_edits_after_asking(self):
+        fb = read("references/feedback.md")
+        for heading in ("## Compare the two versions", "## Classify each change",
+                        "## Propose, then ask", "## Record"):
+            self.assertIn(heading, fb, f"feedback.md needs {heading}")
+        f = flat(fb)
+        self.assertIn("sentence by sentence", f, "comparison granularity must be stated")
+        for cls in ("voice", "fact", "length", "structure", "other"):
+            self.assertIn(cls, f, f"classification must include: {cls}")
+        self.assertIn("only voice changes become candidate rules", f)
+        self.assertIn("a corrected typo, number, name, or fact is never a voice rule", f)
+        self.assertIn("never write a rule into learned.md without the person saying yes", f)
+        self.assertIn("the sentences the person rewrote are their own original writing", f,
+                      "edited sentences count as human corpus")
+        self.assertIn("the sentences they left unchanged are accepted ai text", f)
+        line_format = "- [active|revoked] YYYY-MM-DD | <context label> | <rule> | source: <task>, <location>"
+        self.assertIn(line_format, fb, "the learned.md line format must be stated exactly")
+        self.assertIn("revoking flips the status word in place", f)
+
 
 if __name__ == "__main__":
     unittest.main()
