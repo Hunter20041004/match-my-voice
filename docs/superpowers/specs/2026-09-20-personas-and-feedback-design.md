@@ -90,7 +90,7 @@ Agent 產出第一版  ──→  使用者在自己的編輯器改到滿意  �
 |---|---|
 | 角色清單 | 列出所有角色，標示目前角色，一鍵切換 |
 | 新增角色 | 名稱、類型（self／role）。建好是空的，樣本由 Agent 在對話裡收 |
-| 編輯口吻檔 | **直接編輯那份 Markdown**，有基本排版。看到的就是 Agent 讀到的 |
+| 編輯口吻檔 | **直接編輯那份 Markdown**。至少是一個等寬字體的可編輯文字區加儲存鈕；即時預覽可選。看到的就是 Agent 讀到的 |
 | 學習紀錄 | 每條學到的規則：內容、來源、日期。可撤銷、可改字 |
 | 刪除角色 | 要確認 |
 
@@ -102,7 +102,7 @@ Agent 產出第一版  ──→  使用者在自己的編輯器改到滿意  �
 
 | 決定 | 選擇 | 理由 |
 |---|---|---|
-| 介面怎麼跑 | 一個小 Node 伺服器 ＋ 單檔 HTML | 讀寫本機檔案需要伺服器；Claude Code／Codex 本身就是 Node，使用者一定有 |
+| 介面怎麼跑 | 一個小 Node 伺服器 ＋ 單檔 HTML。**伺服器只用 Node 內建模組（http、fs、path），不裝任何套件** | 讀寫本機檔案需要伺服器；Claude Code／Codex 本身就是 Node，使用者一定有；不裝套件才能讓「clone 完直接開」成立 |
 | 要不要 build | 不要。Tailwind CDN ＋ CSS 變數 | `git clone` 完直接能開，不用 `npm install`；全域規範對單檔 HTML 允許此例外 |
 | 儲存結構 | `~/.config/match-my-voice/` 下：`config.json`（目前角色）、`profiles/<id>/VOICE.md`、`profiles/<id>/learned.md` | 純文字，使用者用任何編輯器都能開 |
 | 現有 `profiles/default/` | 自動視為第一個 `self` 角色，不搬不改 | 已有使用者不受影響 |
