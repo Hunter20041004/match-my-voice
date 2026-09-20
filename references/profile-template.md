@@ -13,7 +13,7 @@ Use only supported fields. This is a schema guide, not a completed person's prof
 - Context modes: what changes per context, using the same labels sources.md offers when it asks what the person is writing (job application, work email, social post, report or reflection). A formal version of the person is still that person, so a mode is not a conflict with the core; it is the same person in a different room.
 - Context coverage: which contexts this profile has actually been built from, using those same context-mode labels, and which of them still have no sample evidence at all. Later sessions read this to decide whether new samples are needed. This tracks context evidence, not the Calibration bullet's per-draft feedback check.
 - Avoidances: only evidenced dislikes, with reasons and exceptions where relevant.
-- Reviewed examples: distinguish original human samples from accepted AI drafts.
+- Reviewed examples: distinguish original human samples from accepted AI drafts, each as short excerpts only, never the full accepted draft.
 - Calibration: task, actual feedback, what remains untested.
 - Revision notes: changes and superseded rules, without retaining sensitive deleted content.
 

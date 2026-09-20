@@ -52,7 +52,7 @@ Show a short explanation of the patterns that matter, then one short trial passa
 
 If the user needs an immediate draft, provide it with a provisional profile rather than block on calibration. Mark profiles as provisional until the person has reviewed a trial. User acceptance applies to the reviewed context, not proof of accuracy in every genre.
 
-Save using [profile structure](references/profile-template.md), omitting unsupported sections. Tell the user the actual location or provide the profile file. Keep short excerpts as evidence — a few representative lines per sample — because a profile that cannot show its evidence cannot be argued with or corrected. Never store the full text of a source document, and do not copy contacts, credentials, or unrelated life history into the profile.
+Save using [profile structure](references/profile-template.md), omitting unsupported sections. Tell the user the actual location or provide the profile file. Keep short excerpts as evidence — a few representative lines per sample, only as many as it takes to show the pattern being recorded, stopping once that pattern is illustrated — because a profile that cannot show its evidence cannot be argued with or corrected. Never store the full text of a source document, and do not copy contacts, credentials, or unrelated life history into the profile.
 
 ## Write using the profile
 
