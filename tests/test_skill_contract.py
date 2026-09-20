@@ -277,12 +277,14 @@ class SourcePickerContractTests(unittest.TestCase):
             self.assertNotIn("曾尉庭", prose, f"maintainer identity leaked into {path}")
 
     # Spec scope: the README explains the new first-run behaviour.
-    def test_readme_documents_the_source_picker(self):
+    # Spec scope: the README describes the task-driven first run.
+    def test_readme_documents_the_task_driven_first_run(self):
         readme = read("README.md")
         first_run = readme[readme.index("## 第一次用"):readme.index("## 之後使用")]
-        self.assertIn("你想從哪裡", first_run,
-                      "README must show the one question the skill asks")
-        for promise in ("讀得到", "跳過", "確認要分析哪些"):
+        self.assertNotIn("你想從哪裡", first_run,
+                         "the old open-ended source question must be gone from the README")
+        for promise in ("你要寫什麼", "在講什麼", "沒勾的不會被讀",
+                        "是你自己寫的嗎", "讀得到"):
             self.assertIn(promise, first_run, f"README first-run must mention: {promise}")
 
     # Package hygiene: build artifacts never ship inside a cloned skill.
