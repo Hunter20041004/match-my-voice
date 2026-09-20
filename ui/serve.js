@@ -1,13 +1,35 @@
 #!/usr/bin/env node
 // Local management page for match-my-voice. Node built-ins only; no AI calls.
 import { createServer } from "node:http";
-import { readFileSync, existsSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
+import { readFileSync, existsSync, mkdirSync, readdirSync, writeFileSync, rmSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { homedir } from "node:os";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ID_RE = /^[a-z0-9-]{1,40}$/;
+
+export function slugify(name) {
+  const s = String(name).toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40).replace(/-+$/g, "");
+  return s && s !== "." && s !== ".." ? s : "persona";
+}
+
+function uniqueId(home, base) {
+  const root = join(home, "profiles");
+  if (!existsSync(join(root, base))) return base;
+  for (let n = 2; n < 1000; n += 1) {
+    const candidate = `${base.slice(0, 40 - String(n).length - 1)}-${n}`;
+    if (!existsSync(join(root, candidate))) return candidate;
+  }
+  throw new Error("could not allocate id");
+}
+
+async function readBody(req) {
+  const chunks = [];
+  for await (const c of req) chunks.push(c);
+  const raw = Buffer.concat(chunks).toString("utf8");
+  return raw ? JSON.parse(raw) : {};
+}
 
 export function defaultHome() {
   return process.env.MATCH_MY_VOICE_HOME || join(homedir(), ".config", "match-my-voice");
@@ -45,6 +67,33 @@ export function listPersonas(home) {
   return { active: active ?? null, personas };
 }
 
+export function createPersona(home, { name, type }) {
+  ensureHome(home);
+  const cleanName = String(name ?? "").trim();
+  if (!cleanName) throw Object.assign(new Error("name required"), { status: 400 });
+  if (type !== "self" && type !== "role") throw Object.assign(new Error("type must be self or role"), { status: 400 });
+  const id = uniqueId(home, slugify(cleanName));
+  const dir = join(home, "profiles", id);
+  mkdirSync(dir, { recursive: true });
+  const meta = { name: cleanName, type, created: today() };
+  writeFileSync(join(dir, "persona.json"), JSON.stringify(meta, null, 2));
+  writeFileSync(join(dir, "VOICE.md"), `# ${cleanName}\n\n（尚未建立口吻檔。在對話裡請 Agent 用 match-my-voice 收集樣本。）\n`);
+  writeFileSync(join(dir, "learned.md"), "");
+  return { id, ...meta };
+}
+
+export function deletePersona(home, id) {
+  ensureHome(home);
+  if (!ID_RE.test(id)) return false;
+  const dir = join(home, "profiles", id);
+  if (!existsSync(join(dir, "persona.json"))) return false;
+  rmSync(dir, { recursive: true, force: true });
+  const cfgPath = join(home, "config.json");
+  const cfg = readJson(cfgPath, { active: null });
+  if (cfg.active === id) writeFileSync(cfgPath, JSON.stringify({ active: null }, null, 2));
+  return true;
+}
+
 function send(res, status, body, type = "application/json; charset=utf-8") {
   res.writeHead(status, { "content-type": type });
   res.end(typeof body === "string" ? body : JSON.stringify(body));
@@ -57,9 +106,17 @@ export function createApp(home) {
     try {
       if (req.method === "GET" && url.pathname === "/") return send(res, 200, page(), "text/html; charset=utf-8");
       if (req.method === "GET" && url.pathname === "/api/personas") return send(res, 200, listPersonas(home));
+      if (req.method === "POST" && url.pathname === "/api/personas") {
+        const body = await readBody(req);
+        return send(res, 201, createPersona(home, body));
+      }
+      const del = url.pathname.match(/^\/api\/personas\/([^/]+)$/);
+      if (req.method === "DELETE" && del) {
+        return deletePersona(home, decodeURIComponent(del[1])) ? send(res, 204, "") : send(res, 404, { error: "not found" });
+      }
       return send(res, 404, { error: "not found" });
     } catch (err) {
-      return send(res, 500, { error: String(err.message || err) });
+      return send(res, err.status || 500, { error: String(err.message || err) });
     }
   });
   return { server };
