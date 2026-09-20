@@ -105,6 +105,18 @@ export function setActive(home, id) {
   return { active: id };
 }
 
+function personaDir(home, id) {
+  if (!ID_RE.test(String(id))) return null;
+  const dir = join(home, "profiles", id);
+  return existsSync(join(dir, "persona.json")) ? dir : null;
+}
+
+async function readText(req) {
+  const chunks = [];
+  for await (const c of req) chunks.push(c);
+  return Buffer.concat(chunks).toString("utf8");
+}
+
 function send(res, status, body, type = "application/json; charset=utf-8") {
   res.writeHead(status, { "content-type": type });
   res.end(typeof body === "string" ? body : JSON.stringify(body));
@@ -122,6 +134,13 @@ export function createApp(home) {
       if (req.method === "POST" && url.pathname === "/api/personas") {
         const body = await readBody(req);
         return send(res, 201, createPersona(home, body));
+      }
+      const prof = url.pathname.match(/^\/api\/personas\/([^/]+)\/profile$/);
+      if (prof) {
+        const dir = personaDir(home, decodeURIComponent(prof[1]));
+        if (!dir) return send(res, 404, { error: "not found" });
+        if (req.method === "GET") return send(res, 200, readFileSync(join(dir, "VOICE.md"), "utf8"), "text/markdown; charset=utf-8");
+        if (req.method === "PUT") { writeFileSync(join(dir, "VOICE.md"), await readText(req)); return send(res, 200, { ok: true }); }
       }
       const del = url.pathname.match(/^\/api\/personas\/([^/]+)$/);
       if (req.method === "DELETE" && del) {
