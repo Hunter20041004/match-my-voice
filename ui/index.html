@@ -163,6 +163,29 @@ $("#new-form").addEventListener("submit", async (e) => {
   } catch (err) { $("#new-error").textContent = err.message; $("#new-error").classList.remove("hidden"); }
 });
 
+let profileDirty = false;
+window.addEventListener("persona-selected", async (e) => {
+  const id = e.detail; const pane = $("#profile-pane");
+  if (!id) { pane.innerHTML = `<p class="text-sm muted">選一個角色。</p>`; $("#profile-name").textContent = ""; return; }
+  const p = state.personas.find(x => x.id === id); $("#profile-name").textContent = `— ${p.name}`;
+  const text = await api(`/api/personas/${encodeURIComponent(id)}/profile`);
+  pane.innerHTML = `
+    <p class="text-xs muted mb-2">你看到的就是 Agent 讀到的。直接改字，按儲存。</p>
+    <textarea id="profile-text" class="mono w-full h-[60vh] p-3" spellcheck="false" aria-label="口吻檔內容"></textarea>
+    <div class="flex items-center justify-between mt-3">
+      <span id="profile-status" class="text-xs muted" aria-live="polite"></span>
+      <button id="profile-save" class="btn btn-primary" disabled>儲存</button>
+    </div>`;
+  const ta = $("#profile-text"); ta.value = text; profileDirty = false;
+  ta.addEventListener("input", () => { profileDirty = true; $("#profile-save").disabled = false; $("#profile-status").textContent = "未儲存"; });
+  $("#profile-save").addEventListener("click", async () => {
+    $("#profile-save").disabled = true; $("#profile-status").textContent = "儲存中…";
+    try { await api(`/api/personas/${encodeURIComponent(id)}/profile`, { method: "PUT", headers: { "content-type": "text/plain; charset=utf-8" }, body: ta.value }); profileDirty = false; $("#profile-status").textContent = "已儲存 " + new Date().toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit" }); }
+    catch (err) { $("#profile-status").textContent = "儲存失敗：" + err.message; $("#profile-save").disabled = false; }
+  });
+});
+window.addEventListener("beforeunload", (e) => { if (profileDirty) { e.preventDefault(); e.returnValue = ""; } });
+
 loadPersonas().catch((err) => { $("#persona-empty").textContent = "讀取失敗：" + err.message; $("#persona-empty").classList.remove("hidden"); });
 </script>
 </body>
