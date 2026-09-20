@@ -2,6 +2,8 @@
 
 Use only supported fields. This is a schema guide, not a completed person's profile.
 
+A profile belongs to one persona. The persona's `persona.json` beside it holds `"name"` (display name), `"type"` (`"self"` for the person's own voice, `"role"` for a voice they write on behalf of), and `"created"`. The profile below describes expression only.
+
 - Owner or chosen alias; profile identifier.
 - Language and regional variety if known; intended audiences and genres.
 - Status: provisional or reviewed, with the scope of review, and any named gaps in coverage.

@@ -317,5 +317,33 @@ class SourcePickerContractTests(unittest.TestCase):
             self.assertIn(pattern, ignored, f".gitignore must exclude {pattern}")
 
 
+class PersonaContractTests(unittest.TestCase):
+    """Traces to docs/superpowers/specs/2026-09-20-personas-and-feedback-design.md."""
+    longMessage = False
+
+    # Check 1: several personas; UI sets the active one; chat overrides once.
+    def test_skill_defines_personas_and_active_persona_resolution(self):
+        skill = flat(read("SKILL.md"))
+        self.assertIn("is one complete voice profile with its own core habits", skill,
+                      "SKILL.md must define the term persona")
+        for term in ("config.json", "persona.json", "learned.md"):
+            self.assertIn(term, skill, f"SKILL.md must introduce: {term}")
+        self.assertIn('"active"', read("SKILL.md"), "config.json's active key must be named")
+        self.assertIn("read the active persona from", skill,
+                      "the default persona must come from config.json")
+        self.assertIn("overrides it for this task only", skill,
+                      "a chat-level persona choice must be one-off")
+        self.assertIn("only one persona exists, use it", skill,
+                      "single persona needs no question")
+        self.assertIn("ask once", skill, "several personas and no active one → one question")
+        self.assertIn("personas never inherit from each other", skill,
+                      "personas must be independent")
+
+        template = flat(read("references/profile-template.md"))
+        self.assertIn("persona.json", template)
+        for t in ('"self"', '"role"'):
+            self.assertIn(t, read("references/profile-template.md"), f"type value {t}")
+
+
 if __name__ == "__main__":
     unittest.main()

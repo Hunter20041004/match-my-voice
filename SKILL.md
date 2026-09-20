@@ -16,11 +16,13 @@ Help each user write in their own voice, grounded in their own samples. The dist
 
 ## Find and separate personal profiles
 
-Use the user-provided profile or path first. Otherwise, on a local filesystem check `~/.config/match-my-voice/profiles/default/VOICE.md`. Create it only after identifying whose voice is being captured. If it belongs to someone else, keep it separate and select or create a clearly named profile. Never merge different people's samples.
+A **persona** is one complete voice profile with its own core habits, context modes, and coverage record. One person may keep several: their own voice (`"type": "self"`), and voices they write on behalf of — a club, a title, an organisation (`"type": "role"`). A formal version of the person is not a persona; it is a context mode inside their `self` persona. Personas never inherit from each other.
 
-For multiple people, languages, or contexts, use distinct named profiles under `~/.config/match-my-voice/profiles/`. Do not derive file paths directly from unchecked names. A suitable existing profile may contain context modes rather than requiring a file per mode.
+On a local filesystem the storage root is `~/.config/match-my-voice/`. Each persona lives in `profiles/<id>/` with three files: `persona.json` (display name, type, created date), `VOICE.md` (the profile, see [profile structure](references/profile-template.md)), and `learned.md` (rules learned from the person's edits, see [learning from edits](references/feedback.md)). `config.json` at the root holds `{"active": "<id>"}`.
 
-With no filesystem, provide a downloadable or copyable profile and explain that the user must supply it in future sessions. Do not promise automatic cross-session memory. Never put personal profiles or raw samples inside the installed skill folder or a shared repository. Saving locally does not mean the AI host processes the text offline.
+To decide which persona a task uses: if the request names one — "use my own voice", "as the marketing lead" — that choice overrides it for this task only. Otherwise read the active persona from `config.json`. If there is no active entry and only one persona exists, use it. If several exist and none is active, ask once which to use, then continue. Do not derive file paths from unchecked names; ids are short lowercase slugs and the display name lives in `persona.json`. The existing `profiles/default/` is the person's own voice if no other `self` persona exists.
+
+With no filesystem, provide a downloadable or copyable profile and explain that the user must supply it in future sessions. Do not promise automatic cross-session memory. Never put personas, profiles, or raw samples inside the installed skill folder or a shared repository. Saving locally does not mean the AI host processes the text offline.
 
 ## Gather enough evidence without a long interview
 
