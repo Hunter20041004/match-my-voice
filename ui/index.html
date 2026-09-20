@@ -29,7 +29,8 @@
   .btn-primary:hover:not(:disabled) { background: #0077ED; }
   .btn-ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
   .btn-ghost:hover:not(:disabled) { background: var(--hover); }
-  .btn-danger { color: var(--danger); }
+  .btn-danger { color: var(--muted); }
+  .btn-danger:hover:not(:disabled), .btn-danger:focus-visible { color: var(--danger); border-color: rgba(255,59,48,.35); }
   .persona { border: 1px solid transparent; border-radius: 10px; transition: background-color .15s var(--ease), border-color .15s var(--ease); }
   .persona:hover { background: var(--hover); }
   .persona.active { background: var(--hover); border-color: var(--line); }
@@ -48,15 +49,15 @@
 </style>
 </head>
 <body class="min-h-screen">
-<header class="px-6 pt-6 pb-4 max-w-[1400px] mx-auto">
+<header class="px-6 pt-8 pb-8 max-w-[1400px] mx-auto">
   <h1 class="text-2xl">口吻管理</h1>
   <p class="text-sm muted mt-1">Agent 寫東西時讀這裡。改了就生效。</p>
 </header>
 
 <main class="px-6 pb-10 max-w-[1400px] mx-auto grid gap-4 lg:grid-cols-[280px_minmax(0,1fr)_360px]">
   <!-- 角色 -->
-  <section class="panel p-4 self-start" aria-labelledby="h-personas">
-    <div class="flex items-center justify-between mb-3">
+  <section class="panel p-5 self-start" aria-labelledby="h-personas">
+    <div class="flex items-center justify-between mb-5">
       <h2 id="h-personas" class="text-base">角色</h2>
       <button id="new-persona" class="btn btn-primary">新增</button>
     </div>
@@ -65,14 +66,14 @@
   </section>
 
   <!-- 口吻檔 -->
-  <section class="panel p-4 min-w-0" aria-labelledby="h-profile">
-    <h2 id="h-profile" class="text-base mb-3">口吻檔 <span id="profile-name" class="font-normal muted"></span></h2>
+  <section class="panel p-5 min-w-0" aria-labelledby="h-profile">
+    <h2 id="h-profile" class="text-base mb-5">口吻檔 <span id="profile-name" class="font-normal muted"></span></h2>
     <div id="profile-pane"><p class="text-sm muted">選一個角色。</p></div>
   </section>
 
   <!-- 學到的規則 -->
-  <section class="panel p-4 self-start" aria-labelledby="h-learned">
-    <h2 id="h-learned" class="text-base mb-3">學到的規則</h2>
+  <section class="panel p-5 self-start" aria-labelledby="h-learned">
+    <h2 id="h-learned" class="text-base mb-5">學到的規則</h2>
     <div id="learned-pane"><p class="text-sm muted">選一個角色。</p></div>
   </section>
 </main>
@@ -124,16 +125,16 @@ function renderPersonas() {
   $("#persona-empty").classList.toggle("hidden", state.personas.length > 0);
   for (const p of state.personas) {
     const li = document.createElement("li");
-    li.className = "persona p-3 flex items-center justify-between gap-2 cursor-pointer" + (p.id === state.selected ? " active" : "");
+    li.className = "persona p-3 cursor-pointer" + (p.id === state.selected ? " active" : "");
     li.setAttribute("role", "option"); li.setAttribute("aria-selected", p.id === state.selected); li.tabIndex = 0;
     li.innerHTML = `
-      <div class="min-w-0">
-        <div class="font-medium truncate text-sm">${escapeHtml(p.name)}</div>
-        <div class="mt-1 flex gap-1"><span class="badge">${p.type === "role" ? "角色" : "本人"}</span>${p.id === state.active ? '<span class="badge badge-accent">目前使用</span>' : ""}</div>
-      </div>
-      <div class="flex gap-1 shrink-0">
-        ${p.id === state.active ? "" : `<button class="btn btn-ghost" data-act="activate" data-id="${p.id}">設為目前</button>`}
-        <button class="btn btn-ghost btn-danger" data-act="delete" data-id="${p.id}" aria-label="刪除 ${escapeHtml(p.name)}">刪除</button>
+      <div class="font-medium text-sm break-words">${escapeHtml(p.name)}</div>
+      <div class="mt-2 flex items-center justify-between gap-2">
+        <div class="flex gap-1"><span class="badge">${p.type === "role" ? "角色" : "本人"}</span>${p.id === state.active ? '<span class="badge badge-accent">目前使用</span>' : ""}</div>
+        <div class="flex gap-1 shrink-0">
+          ${p.id === state.active ? "" : `<button class="btn btn-ghost" data-act="activate" data-id="${p.id}">設為目前</button>`}
+          <button class="btn btn-ghost btn-danger" data-act="delete" data-id="${p.id}" aria-label="刪除 ${escapeHtml(p.name)}">刪除</button>
+        </div>
       </div>`;
     const select = () => { state.selected = p.id; renderPersonas(); window.dispatchEvent(new CustomEvent("persona-selected", { detail: p.id })); };
     li.addEventListener("click", (e) => { if (!e.target.closest("button")) select(); });
