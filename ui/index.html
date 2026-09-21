@@ -9,89 +9,156 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #F5F5F7; --panel: #FFFFFF; --ink: #1D1D1F; --muted: #6E6E73;
-    --line: #D2D2D7; --accent: #0071E3; --accent-ink: #FFFFFF; --danger: #FF3B30;
-    --hover: #EBEBEF; --radius: 12px;
-    --shadow: 0 1px 3px rgba(0,0,0,.06);
+    /* 色 — 純白底、近黑字、一個藍 */
+    --bg: #FFFFFF; --surface: #FFFFFF; --surface-2: #F5F5F7; --surface-3: #EBEBEF;
+    --ink: #1D1D1F; --ink-2: #6E6E73; --ink-3: #A1A1A6;
+    --accent: #0071E3; --accent-ink: #FFFFFF; --danger: #FF3B30;
+    /* 深度 — 無邊線，靠兩層柔陰影 */
+    --shadow-sm: 0 1px 2px rgba(0,0,0,.04), 0 2px 8px rgba(0,0,0,.04);
+    --shadow-md: 0 0 0 1px rgba(0,0,0,.03), 0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.06);
+    --shadow-lg: 0 0 0 1px rgba(0,0,0,.03), 0 2px 4px rgba(0,0,0,.04), 0 16px 48px rgba(0,0,0,.10);
+    /* 形 */
+    --r-card: 20px; --r-el: 14px; --r-pill: 999px;
+    /* 字 */
     --font: -apple-system, "SF Pro Text", "PingFang TC", "Inter", "Noto Sans TC", system-ui, sans-serif;
-    --mono: "SF Mono", Menlo, ui-monospace, monospace;
-    --ease: cubic-bezier(.2,.8,.2,1);
+    --font-display: -apple-system, "SF Pro Display", "PingFang TC", "Inter", "Noto Sans TC", system-ui, sans-serif;
+    /* 動 */
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --t-fast: 160ms; --t-med: 220ms;
   }
   html { background: var(--bg); color: var(--ink); -webkit-font-smoothing: antialiased; }
-  body { font-family: var(--font) !important; }
-  h1, h2, h3 { font-weight: 600; letter-spacing: -0.01em; }
-  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
-  .btn { border-radius: 8px; padding: 6px 12px; font-weight: 500; font-size: 13px; line-height: 20px; cursor: pointer;
-         transition: background-color .15s var(--ease), transform .1s var(--ease), opacity .15s var(--ease); }
-  .btn:active { transform: scale(.98); }
-  .btn:disabled { opacity: .45; cursor: default; transform: none; }
-  .btn-primary { background: var(--accent); color: var(--accent-ink); }
-  .btn-primary:hover:not(:disabled) { background: #0077ED; }
-  .btn-ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
-  .btn-ghost:hover:not(:disabled) { background: var(--hover); }
-  .btn-danger { color: var(--muted); }
-  .btn-danger:hover:not(:disabled), .btn-danger:focus-visible { color: var(--danger); border-color: rgba(255,59,48,.35); }
-  .persona { border: 1px solid transparent; border-radius: 10px; transition: background-color .15s var(--ease), border-color .15s var(--ease); }
-  .persona:hover { background: var(--hover); }
-  .persona.active { background: var(--hover); border-color: var(--line); }
-  .badge { font-size: 11px; line-height: 16px; padding: 1px 7px; border-radius: 999px; background: var(--bg); color: var(--muted); }
-  .badge-accent { background: rgba(0,113,227,.1); color: var(--accent); }
-  textarea, input { font-family: inherit; color: var(--ink); }
-  textarea.mono { font-family: var(--mono); font-size: 13px; line-height: 1.7; }
-  input, textarea { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
-  input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,113,227,.15); outline: none; }
-  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  dialog::backdrop { background: rgba(0,0,0,.35); }
-  dialog[open] { animation: pop .18s var(--ease); }
-  @keyframes pop { from { opacity: 0; transform: scale(.97); } to { opacity: 1; transform: none; } }
-  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
-  .muted { color: var(--muted); }
+  body { font-family: var(--font) !important; font-size: 15px; line-height: 1.6; }
+  h1, h2, h3 { font-family: var(--font-display); font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; }
+
+  .card { background: var(--surface); border-radius: var(--r-card); box-shadow: var(--shadow-md); }
+
+  /* 按鈕：藥丸、只動 transform 與底色 */
+  .btn { display: inline-flex; align-items: center; gap: 6px; border-radius: var(--r-pill); padding: 9px 18px;
+         font-size: 14px; font-weight: 500; line-height: 20px; cursor: pointer; white-space: nowrap;
+         transition: background-color var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out), transform var(--t-fast) var(--ease-out), opacity var(--t-fast) var(--ease-out); }
+  .btn:active:not(:disabled) { transform: scale(.97); }
+  .btn:disabled { opacity: .4; cursor: default; }
+  .btn-primary { background: var(--ink); color: #fff; }
+  .btn-secondary { background: var(--surface-2); color: var(--ink); }
+  .btn-quiet { background: transparent; color: var(--ink-2); padding: 7px 12px; }
+  .btn-sm { padding: 6px 12px; font-size: 13px; line-height: 18px; }
+  @media (hover: hover) and (pointer: fine) {
+    .btn-primary:hover:not(:disabled) { background: #000; }
+    .btn-secondary:hover:not(:disabled) { background: var(--surface-3); }
+    .btn-quiet:hover:not(:disabled) { background: var(--surface-2); color: var(--ink); }
+    .btn-quiet.danger:hover:not(:disabled) { color: var(--danger); background: rgba(255,59,48,.08); }
+  }
+  .btn svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 1.75; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* 角色卡：無邊線，選中換底色，hover 微浮 */
+  .persona { border-radius: var(--r-el); padding: 14px 16px; cursor: pointer; background: transparent;
+             transition: background-color var(--t-fast) var(--ease-out), transform var(--t-fast) var(--ease-out), box-shadow var(--t-fast) var(--ease-out); }
+  .persona.active { background: var(--surface-2); }
+  @media (hover: hover) and (pointer: fine) {
+    .persona:hover:not(.active) { background: var(--surface-2); }
+  }
+  .persona:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(0,113,227,.25); }
+
+  .chip { display: inline-flex; align-items: center; font-size: 12px; line-height: 16px; padding: 3px 9px; border-radius: var(--r-pill); background: var(--surface-3); color: var(--ink-2); font-weight: 500; }
+  .chip-accent { background: rgba(0,113,227,.10); color: var(--accent); }
+
+  /* 編輯區：像一張紙，沒有硬邊 */
+  .paper { width: 100%; min-height: 56vh; resize: vertical; padding: 24px 28px; font-family: var(--font); font-size: 16px; line-height: 1.85;
+           color: var(--ink); background: var(--surface-2); border: 0; border-radius: var(--r-el); outline: none;
+           transition: box-shadow var(--t-med) var(--ease-out), background-color var(--t-med) var(--ease-out); }
+  .paper:focus { background: var(--surface); box-shadow: 0 0 0 1px rgba(0,0,0,.06), 0 0 0 5px rgba(0,113,227,.12), var(--shadow-sm); }
+  .paper::placeholder { color: var(--ink-3); }
+
+  /* 規則卡 */
+  .rule { border-radius: var(--r-el); padding: 16px 18px; background: var(--surface-2);
+          transition: opacity var(--t-fast) var(--ease-out), background-color var(--t-fast) var(--ease-out); }
+  .rule.revoked { opacity: .5; }
+  .rule.revoked .rule-text { text-decoration: line-through; text-decoration-color: var(--ink-3); }
+
+  /* 進場：只在載入時，交錯 30ms */
+  .stagger > * { opacity: 0; transform: translateY(6px); animation: rise var(--t-med) var(--ease-out) forwards; }
+  .stagger > *:nth-child(1) { animation-delay: 0ms } .stagger > *:nth-child(2) { animation-delay: 30ms }
+  .stagger > *:nth-child(3) { animation-delay: 60ms } .stagger > *:nth-child(4) { animation-delay: 90ms }
+  .stagger > *:nth-child(n+5) { animation-delay: 120ms }
+  @keyframes rise { to { opacity: 1; transform: none; } }
+
+  /* 對話框：置中，從 .96 進 */
+  dialog { border: 0; padding: 0; background: transparent; }
+  dialog::backdrop { background: rgba(0,0,0,.28); backdrop-filter: blur(6px); }
+  dialog[open] .card { animation: pop var(--t-med) var(--ease-out); }
+  @keyframes pop { from { opacity: 0; transform: scale(.96); } }
+
+  input[type="text"] { width: 100%; padding: 12px 14px; font-size: 16px; font-family: inherit; color: var(--ink);
+    background: var(--surface-2); border: 0; border-radius: 12px; outline: none;
+    transition: box-shadow var(--t-fast) var(--ease-out), background-color var(--t-fast) var(--ease-out); }
+  input[type="text"]:focus { background: var(--surface); box-shadow: 0 0 0 1px rgba(0,0,0,.06), 0 0 0 5px rgba(0,113,227,.12); }
+  .radio { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; cursor: pointer; transition: background-color var(--t-fast) var(--ease-out); }
+  .radio:has(input:checked) { background: var(--surface-2); }
+  .radio input { accent-color: var(--accent); width: 16px; height: 16px; }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+  .btn:focus-visible, .paper:focus-visible, input:focus-visible { outline: none; }
+  .muted { color: var(--ink-2); } .faint { color: var(--ink-3); }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    .stagger > * { opacity: 1; transform: none; }
+  }
 </style>
 </head>
 <body class="min-h-screen">
-<header class="px-6 pt-8 pb-8 max-w-[1400px] mx-auto">
-  <h1 class="text-2xl">口吻管理</h1>
-  <p class="text-sm muted mt-1">Agent 寫東西時讀這裡。改了就生效。</p>
+
+<header class="max-w-[1400px] mx-auto px-8 pt-14 pb-10">
+  <h1 class="text-[32px] md:text-[44px]">口吻管理<span class="muted font-medium block md:inline"><span class="hidden md:inline">，</span>Agent 寫東西前讀這裡。</span></h1>
+  <p class="mt-3 text-[15px] muted">改了就生效。這頁不叫任何 AI，只讀寫你電腦上的檔案。</p>
 </header>
 
-<main class="px-6 pb-10 max-w-[1400px] mx-auto grid gap-4 lg:grid-cols-[280px_minmax(0,1fr)_360px]">
+<main class="max-w-[1400px] mx-auto px-8 pb-20 grid gap-6 lg:grid-cols-[300px_minmax(0,1fr)_380px]">
+
   <!-- 角色 -->
-  <section class="panel p-5 self-start" aria-labelledby="h-personas">
-    <div class="flex items-center justify-between mb-5">
-      <h2 id="h-personas" class="text-base">角色</h2>
-      <button id="new-persona" class="btn btn-primary">新增</button>
+  <section class="card p-7 self-start" aria-labelledby="h-personas">
+    <div class="flex items-center justify-between mb-6">
+      <h2 id="h-personas" class="text-[20px]">角色</h2>
+      <button id="new-persona" class="btn btn-primary btn-sm">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>新增
+      </button>
     </div>
-    <ul id="persona-list" class="space-y-1" role="listbox" aria-label="角色清單"></ul>
-    <p id="persona-empty" class="text-sm muted hidden">還沒有角色。按「新增」建第一個。</p>
+    <ul id="persona-list" class="space-y-1 stagger" role="listbox" aria-label="角色清單"></ul>
+    <p id="persona-empty" class="text-[15px] muted hidden">還沒有角色。按「新增」建第一個。</p>
   </section>
 
   <!-- 口吻檔 -->
-  <section class="panel p-5 min-w-0" aria-labelledby="h-profile">
-    <h2 id="h-profile" class="text-base mb-5">口吻檔 <span id="profile-name" class="font-normal muted"></span></h2>
-    <div id="profile-pane"><p class="text-sm muted">選一個角色。</p></div>
+  <section class="card p-7 min-w-0" aria-labelledby="h-profile">
+    <div class="flex items-baseline gap-3 mb-6">
+      <h2 id="h-profile" class="text-[20px]">口吻檔</h2>
+      <span id="profile-name" class="text-[15px] muted"></span>
+    </div>
+    <div id="profile-pane"><p class="text-[15px] muted">選一個角色。</p></div>
   </section>
 
   <!-- 學到的規則 -->
-  <section class="panel p-5 self-start" aria-labelledby="h-learned">
-    <h2 id="h-learned" class="text-base mb-5">學到的規則</h2>
-    <div id="learned-pane"><p class="text-sm muted">選一個角色。</p></div>
+  <section class="card p-7 self-start" aria-labelledby="h-learned">
+    <h2 id="h-learned" class="text-[20px] mb-6">學到的規則</h2>
+    <div id="learned-pane"><p class="text-[15px] muted">選一個角色。</p></div>
   </section>
 </main>
 
-<dialog id="new-dialog" class="panel p-5 w-[min(92vw,420px)]">
-  <form method="dialog" id="new-form" class="space-y-4">
-    <h3 class="text-lg">新增角色</h3>
-    <label class="block text-sm">名稱
-      <input name="name" required class="mt-1 w-full px-3 py-2 text-base" placeholder="例如：徵才月行銷長" autocomplete="off">
+<dialog id="new-dialog">
+  <form method="dialog" id="new-form" class="card p-8 w-[min(92vw,440px)] space-y-6" style="box-shadow: var(--shadow-lg)">
+    <h3 class="text-[24px]">新增角色</h3>
+    <label class="block">
+      <span class="block text-[13px] font-medium muted mb-2">名稱</span>
+      <input type="text" name="name" required placeholder="例如：徵才月行銷長" autocomplete="off">
     </label>
-    <fieldset class="text-sm space-y-1">
-      <legend class="mb-1 muted">這是誰的口吻？</legend>
-      <label class="flex items-center gap-2"><input type="radio" name="type" value="self" checked class="accent-[var(--accent)]"> 我自己</label>
-      <label class="flex items-center gap-2"><input type="radio" name="type" value="role" class="accent-[var(--accent)]"> 我代表的某個角色或組織</label>
+    <fieldset>
+      <legend class="text-[13px] font-medium muted mb-2">這是誰的口吻？</legend>
+      <div class="space-y-1">
+        <label class="radio"><input type="radio" name="type" value="self" checked><span>我自己</span></label>
+        <label class="radio"><input type="radio" name="type" value="role"><span>我代表的某個角色或組織</span></label>
+      </div>
     </fieldset>
-    <p id="new-error" class="text-sm hidden" style="color: var(--danger)" role="alert"></p>
-    <div class="flex justify-end gap-2 pt-1">
-      <button type="button" id="new-cancel" class="btn btn-ghost">取消</button>
+    <p id="new-error" class="text-[14px] hidden" style="color: var(--danger)" role="alert"></p>
+    <div class="flex justify-end gap-2 pt-2">
+      <button type="button" id="new-cancel" class="btn btn-secondary">取消</button>
       <button type="submit" class="btn btn-primary">建立</button>
     </div>
   </form>
@@ -100,6 +167,12 @@
 <script>
 const $ = (s) => document.querySelector(s);
 const state = { active: null, personas: [], selected: null };
+const ICON = {
+  check: '<svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>',
+  x: '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  undo: '<svg viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-1"/></svg>',
+  pen: '<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
+};
 
 async function api(path, opts = {}) {
   const res = await fetch(path, opts);
@@ -109,7 +182,6 @@ async function api(path, opts = {}) {
   if (!res.ok) throw new Error(body && body.error ? body.error : `HTTP ${res.status}`);
   return body;
 }
-
 function escapeHtml(s) { return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
 
 async function loadPersonas() {
@@ -125,15 +197,15 @@ function renderPersonas() {
   $("#persona-empty").classList.toggle("hidden", state.personas.length > 0);
   for (const p of state.personas) {
     const li = document.createElement("li");
-    li.className = "persona p-3 cursor-pointer" + (p.id === state.selected ? " active" : "");
+    li.className = "persona" + (p.id === state.selected ? " active" : "");
     li.setAttribute("role", "option"); li.setAttribute("aria-selected", p.id === state.selected); li.tabIndex = 0;
     li.innerHTML = `
-      <div class="font-medium text-sm break-words">${escapeHtml(p.name)}</div>
+      <div class="text-[15px] font-medium break-words">${escapeHtml(p.name)}</div>
       <div class="mt-2 flex items-center justify-between gap-2">
-        <div class="flex gap-1"><span class="badge">${p.type === "role" ? "角色" : "本人"}</span>${p.id === state.active ? '<span class="badge badge-accent">目前使用</span>' : ""}</div>
-        <div class="flex gap-1 shrink-0">
-          ${p.id === state.active ? "" : `<button class="btn btn-ghost" data-act="activate" data-id="${p.id}">設為目前</button>`}
-          <button class="btn btn-ghost btn-danger" data-act="delete" data-id="${p.id}" aria-label="刪除 ${escapeHtml(p.name)}">刪除</button>
+        <div class="flex gap-1.5"><span class="chip">${p.type === "role" ? "角色" : "本人"}</span>${p.id === state.active ? '<span class="chip chip-accent">目前使用</span>' : ""}</div>
+        <div class="flex gap-0.5 shrink-0">
+          ${p.id === state.active ? "" : `<button class="btn btn-quiet btn-sm" data-act="activate" data-id="${p.id}">設為目前</button>`}
+          <button class="btn btn-quiet btn-sm danger" data-act="delete" data-id="${p.id}" aria-label="刪除 ${escapeHtml(p.name)}">刪除</button>
         </div>
       </div>`;
     const select = () => { state.selected = p.id; renderPersonas(); window.dispatchEvent(new CustomEvent("persona-selected", { detail: p.id })); };
@@ -141,6 +213,7 @@ function renderPersonas() {
     li.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(); } });
     ul.appendChild(li);
   }
+  ul.classList.remove("stagger"); // 只在首次載入交錯
 }
 
 $("#persona-list").addEventListener("click", async (e) => {
@@ -167,29 +240,29 @@ $("#new-form").addEventListener("submit", async (e) => {
 let profileDirty = false;
 window.addEventListener("persona-selected", async (e) => {
   const id = e.detail; const pane = $("#profile-pane");
-  if (!id) { pane.innerHTML = `<p class="text-sm muted">選一個角色。</p>`; $("#profile-name").textContent = ""; return; }
-  const p = state.personas.find(x => x.id === id); $("#profile-name").textContent = `— ${p.name}`;
+  if (!id) { pane.innerHTML = `<p class="text-[15px] muted">選一個角色。</p>`; $("#profile-name").textContent = ""; return; }
+  const p = state.personas.find(x => x.id === id); $("#profile-name").textContent = p.name;
   const text = await api(`/api/personas/${encodeURIComponent(id)}/profile`);
   pane.innerHTML = `
-    <p class="text-xs muted mb-2">你看到的就是 Agent 讀到的。直接改字，按儲存。</p>
-    <textarea id="profile-text" class="mono w-full h-[60vh] p-3" spellcheck="false" aria-label="口吻檔內容"></textarea>
-    <div class="flex items-center justify-between mt-3">
-      <span id="profile-status" class="text-xs muted" aria-live="polite"></span>
-      <button id="profile-save" class="btn btn-primary" disabled>儲存</button>
+    <textarea id="profile-text" class="paper" spellcheck="false" aria-label="口吻檔內容" placeholder="還是空的。在對話裡請 Agent 用 match-my-voice 收集樣本。"></textarea>
+    <div class="flex items-center justify-between mt-5">
+      <span class="text-[13px] faint">你看到的就是 Agent 讀到的。<span id="profile-status" aria-live="polite"></span></span>
+      <button id="profile-save" class="btn btn-primary" disabled>${ICON.check}儲存</button>
     </div>`;
   const ta = $("#profile-text"); ta.value = text; profileDirty = false;
-  ta.addEventListener("input", () => { profileDirty = true; $("#profile-save").disabled = false; $("#profile-status").textContent = "未儲存"; });
+  const status = (t) => { $("#profile-status").textContent = t ? "　" + t : ""; };
+  ta.addEventListener("input", () => { profileDirty = true; $("#profile-save").disabled = false; status("未儲存"); });
   $("#profile-save").addEventListener("click", async () => {
-    $("#profile-save").disabled = true; $("#profile-status").textContent = "儲存中…";
-    try { await api(`/api/personas/${encodeURIComponent(id)}/profile`, { method: "PUT", headers: { "content-type": "text/plain; charset=utf-8" }, body: ta.value }); profileDirty = false; $("#profile-status").textContent = "已儲存 " + new Date().toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit" }); }
-    catch (err) { $("#profile-status").textContent = "儲存失敗：" + err.message; $("#profile-save").disabled = false; }
+    $("#profile-save").disabled = true; status("儲存中…");
+    try { await api(`/api/personas/${encodeURIComponent(id)}/profile`, { method: "PUT", headers: { "content-type": "text/plain; charset=utf-8" }, body: ta.value }); profileDirty = false; status("已儲存 " + new Date().toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit" })); }
+    catch (err) { status("儲存失敗：" + err.message); $("#profile-save").disabled = false; }
   });
 });
 window.addEventListener("beforeunload", (e) => { if (profileDirty) { e.preventDefault(); e.returnValue = ""; } });
 
 window.addEventListener("persona-selected", async (e) => {
   const id = e.detail; const pane = $("#learned-pane");
-  if (!id) { pane.innerHTML = `<p class="text-sm muted">選一個角色。</p>`; return; }
+  if (!id) { pane.innerHTML = `<p class="text-[15px] muted">選一個角色。</p>`; return; }
   await renderLearned(id);
 });
 
@@ -197,15 +270,15 @@ async function renderLearned(id) {
   const pane = $("#learned-pane");
   const { entries } = await api(`/api/personas/${encodeURIComponent(id)}/learned`);
   const rules = entries.filter(x => x.status !== "unparsed");
-  if (!rules.length) { pane.innerHTML = `<p class="text-sm muted">還沒學到東西。把改好的草稿貼回給 Agent，它會問你要不要記下來。</p>`; return; }
+  if (!rules.length) { pane.innerHTML = `<p class="text-[15px] muted leading-relaxed">還沒學到東西。<br>把改好的草稿貼回給 Agent，它會問你要不要記下來。</p>`; return; }
   pane.innerHTML = `<ul class="space-y-2">${rules.map(x => `
-    <li class="rounded-[10px] border p-3 transition-opacity ${x.status === "revoked" ? "opacity-50" : ""}" style="border-color: var(--line)">
-      <div class="text-xs muted mb-1">${x.date} · ${escapeHtml(x.context)}${x.status === "revoked" ? " · 已撤銷" : ""}</div>
-      <div class="text-sm leading-relaxed" data-rule="${x.index}">${escapeHtml(x.rule)}</div>
-      <div class="text-xs muted mt-1">來源：${escapeHtml(x.source)}</div>
-      <div class="flex gap-1 mt-2">
-        <button class="btn btn-ghost" data-act="edit" data-i="${x.index}">改字</button>
-        <button class="btn btn-ghost ${x.status === "active" ? "btn-danger" : ""}" data-act="toggle" data-i="${x.index}" data-next="${x.status === "active" ? "revoked" : "active"}">${x.status === "active" ? "撤銷" : "恢復"}</button>
+    <li class="rule ${x.status === "revoked" ? "revoked" : ""}">
+      <div class="text-[12px] faint mb-1.5">${x.date} · ${escapeHtml(x.context)}${x.status === "revoked" ? " · 已撤銷" : ""}</div>
+      <div class="rule-text text-[15px] leading-relaxed" data-rule="${x.index}">${escapeHtml(x.rule)}</div>
+      <div class="text-[12px] faint mt-1.5">來源：${escapeHtml(x.source)}</div>
+      <div class="flex gap-0.5 mt-3 -ml-2">
+        <button class="btn btn-quiet btn-sm" data-act="edit" data-i="${x.index}">${ICON.pen}改字</button>
+        <button class="btn btn-quiet btn-sm ${x.status === "active" ? "danger" : ""}" data-act="toggle" data-i="${x.index}" data-next="${x.status === "active" ? "revoked" : "active"}">${x.status === "active" ? ICON.x + "撤銷" : ICON.undo + "恢復"}</button>
       </div>
     </li>`).join("")}</ul>`;
   pane.onclick = async (ev) => {
