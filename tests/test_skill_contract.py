@@ -1,9 +1,12 @@
 """Contract tests for the Match My Voice skill package.
 
-Each test traces to a numbered acceptance check in
-docs/superpowers/specs/2026-09-08-sample-sourcing-design.md ("驗收檢查"),
-except the package-hygiene tests, which guard the privacy boundary described
-in docs/superpowers/specs/2026-09-05-source-picker-design.md.
+Each test traces to a numbered acceptance check in one of:
+docs/superpowers/specs/2026-09-08-sample-sourcing-design.md ("驗收檢查") for
+SourcePickerContractTests, and
+docs/superpowers/specs/2026-09-20-personas-and-feedback-design.md for
+PersonaContractTests — except the package-hygiene tests, which guard the privacy
+boundary described in docs/superpowers/specs/2026-09-05-source-picker-design.md.
+The UI server has its own tests under tests/ui/ (node --test tests/ui/*.test.js).
 
 These check that the skill *document* states the required behaviour. They
 cannot prove an agent follows it — the multi-person blind test in
@@ -315,6 +318,90 @@ class SourcePickerContractTests(unittest.TestCase):
         ignored = read(".gitignore").split()
         for pattern in ("__pycache__/", "*.py[cod]"):
             self.assertIn(pattern, ignored, f".gitignore must exclude {pattern}")
+
+
+class PersonaContractTests(unittest.TestCase):
+    """Traces to docs/superpowers/specs/2026-09-20-personas-and-feedback-design.md."""
+    longMessage = False
+
+    # Check 1: several personas; UI sets the active one; chat overrides once.
+    def test_skill_defines_personas_and_active_persona_resolution(self):
+        skill = flat(read("SKILL.md"))
+        self.assertIn("is one complete voice profile with its own core habits", skill,
+                      "SKILL.md must define the term persona")
+        for term in ("config.json", "persona.json", "learned.md"):
+            self.assertIn(term, skill, f"SKILL.md must introduce: {term}")
+        self.assertIn('"active"', read("SKILL.md"), "config.json's active key must be named")
+        self.assertIn("read the active persona from", skill,
+                      "the default persona must come from config.json")
+        self.assertIn("overrides it for this task only", skill,
+                      "a chat-level persona choice must be one-off")
+        self.assertIn("only one persona exists, use it", skill,
+                      "single persona needs no question")
+        self.assertIn("ask once", skill, "several personas and no active one → one question")
+        self.assertIn("personas never inherit from each other", skill,
+                      "personas must be independent")
+
+        template = flat(read("references/profile-template.md"))
+        self.assertIn("persona.json", template)
+        for t in ('"self"', '"role"'):
+            self.assertIn(t, read("references/profile-template.md"), f"type value {t}")
+
+    # Check 2: a role persona asks whether samples fit the role, not who wrote them.
+    def test_role_personas_ask_about_representativeness(self):
+        sources = read("references/sources.md")
+        section = flat(sources[sources.index("## Author confirmation"):
+                               sources.index("## Candidate review")])
+        self.assertIn("for a self persona", section)
+        self.assertIn("for a role persona", section)
+        self.assertIn("is this what the role should sound like", section,
+                      "the role question must be stated verbatim")
+        self.assertIn("written by several people is expected", section,
+                      "multiple authors are normal for a role")
+        self.assertIn("did you write all of these yourself", section,
+                      "the self question must survive")
+
+    # Checks 3 and 4: learn only voice-class edits, and only after asking.
+    def test_feedback_reference_learns_only_voice_edits_after_asking(self):
+        fb = read("references/feedback.md")
+        for heading in ("## Compare the two versions", "## Classify each change",
+                        "## Propose, then ask", "## Record"):
+            self.assertIn(heading, fb, f"feedback.md needs {heading}")
+        f = flat(fb)
+        self.assertIn("sentence by sentence", f, "comparison granularity must be stated")
+        for cls in ("voice", "fact", "length", "structure", "other"):
+            self.assertIn(cls, f, f"classification must include: {cls}")
+        self.assertIn("only voice changes become candidate rules", f)
+        self.assertIn("a corrected typo, number, name, or fact is never a voice rule", f)
+        self.assertIn("never write a rule into learned.md without the person saying yes", f)
+        self.assertIn("the sentences the person rewrote are their own original writing", f,
+                      "edited sentences count as human corpus")
+        self.assertIn("the sentences they left unchanged are accepted ai text", f)
+        line_format = "- [active|revoked] YYYY-MM-DD | <context label> | <rule> | source: <task>, <location>"
+        self.assertIn(line_format, fb, "the learned.md line format must be stated exactly")
+        self.assertIn("revoking flips the status word in place", f)
+
+    # Checks 4 and 5: writing applies active learned rules; refining follows feedback.md.
+    def test_write_reads_learned_rules_and_refine_routes_to_feedback(self):
+        skill = read("SKILL.md")
+        self.assertIn("references/feedback.md", skill)
+        f = flat(skill)
+        self.assertIn("then every `[active]` line of `learned.md`", f,
+                      "Write must apply active learned rules")
+        self.assertIn("skip `[revoked]` lines", f)
+        self.assertIn("pastes back an edited version", f,
+                      "Refine must recognise the paste-back case")
+        self.assertIn("follow [learning from edits](references/feedback.md)", f)
+
+    # README explains personas, the feedback loop, and how to open the page.
+    def test_readme_documents_personas_feedback_and_ui(self):
+        readme = read("README.md")
+        self.assertIn("## 管理介面", readme)
+        ui = readme[readme.index("## 管理介面"):]
+        self.assertIn("node ui/serve.js", ui)
+        self.assertIn("不會呼叫任何 AI", ui)
+        for phrase in ("角色", "貼回", "要不要記下來", "撤銷"):
+            self.assertIn(phrase, readme, f"README must mention: {phrase}")
 
 
 if __name__ == "__main__":

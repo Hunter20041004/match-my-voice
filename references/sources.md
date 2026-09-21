@@ -164,16 +164,26 @@ did not pick. **Items the person did not pick are not read.**
 ## Author confirmation
 
 Every automatic filter above can be wrong, and only the person knows the answer.
-**Ask it every time, before any analysis.**
+**Ask it every time, before any analysis.** Which question depends on the
+persona's type in `persona.json`.
+
+For a self persona:
 
 > Did you write all of these yourself?
 > Was any of them heavily edited by someone else or by AI?
 
+For a role persona, material written by several people is expected — a club
+account has had several hands on it — so authorship is not the test. Ask instead:
+
+> Is this what the role should sound like?
+> Is any of it off-brand, or from a period you would rather not copy?
+
 Their answer overrides every signal the skill inferred, and it is what fills in
 the "likely author" line in the candidate review below. That review is for
-correcting individual items, not for asking the authorship question again. If
-the answer is no, follow the Mixed authorship and Mostly AI-edited rules under
-"When a source does not work" below.
+correcting individual items, not for asking the question again. If the answer
+is no, follow the Mixed authorship and Mostly AI-edited rules under "When a
+source does not work" below; for a role persona, treat "off-brand" the way
+those rules treat "not the person's own".
 
 ## Candidate review
 

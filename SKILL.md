@@ -11,16 +11,18 @@ Help each user write in their own voice, grounded in their own samples. The dist
 
 - **Learn:** no suitable profile exists, or the user asks to analyze their voice. Gather samples, infer patterns, calibrate, then save.
 - **Write:** a relevant profile exists. Read it, check its context coverage for the current task, draft, and check facts and voice.
-- **Refine:** the user corrects a draft or supplies new samples. Apply the correction now and update only supported profile rules.
+- **Refine:** the user corrects a draft in the conversation, supplies new samples, or pastes back an edited version of a draft this skill produced. For the paste-back case follow [learning from edits](references/feedback.md). Otherwise apply the correction now and update only supported profile rules.
 - A request to analyze voice alone does not require drafting a full article. A request to write should not turn into a long onboarding interview when usable samples already exist.
 
 ## Find and separate personal profiles
 
-Use the user-provided profile or path first. Otherwise, on a local filesystem check `~/.config/match-my-voice/profiles/default/VOICE.md`. Create it only after identifying whose voice is being captured. If it belongs to someone else, keep it separate and select or create a clearly named profile. Never merge different people's samples.
+A **persona** is one complete voice profile with its own core habits, context modes, and coverage record. One person may keep several: their own voice (`"type": "self"`), and voices they write on behalf of — a club, a title, an organisation (`"type": "role"`). A formal version of the person is not a persona; it is a context mode inside their `self` persona. Personas never inherit from each other.
 
-For multiple people, languages, or contexts, use distinct named profiles under `~/.config/match-my-voice/profiles/`. Do not derive file paths directly from unchecked names. A suitable existing profile may contain context modes rather than requiring a file per mode.
+On a local filesystem the storage root is `~/.config/match-my-voice/`. Each persona lives in `profiles/<id>/` with three files: `persona.json` (display name, type, created date), `VOICE.md` (the profile, see [profile structure](references/profile-template.md)), and `learned.md` (rules learned from the person's edits, see [learning from edits](references/feedback.md)). `config.json` at the root holds `{"active": "<id>"}`.
 
-With no filesystem, provide a downloadable or copyable profile and explain that the user must supply it in future sessions. Do not promise automatic cross-session memory. Never put personal profiles or raw samples inside the installed skill folder or a shared repository. Saving locally does not mean the AI host processes the text offline.
+To decide which persona a task uses: if the request names one — "use my own voice", "as the marketing lead" — that choice overrides it for this task only. Otherwise read the active persona from `config.json`. If there is no active entry and only one persona exists, use it. If several exist and none is active, ask once which to use, then continue. Do not derive file paths from unchecked names; ids are short lowercase slugs and the display name lives in `persona.json`. The existing `profiles/default/` is the person's own voice if no other `self` persona exists.
+
+With no filesystem, provide a downloadable or copyable profile and explain that the user must supply it in future sessions. Do not promise automatic cross-session memory. Never put personas, profiles, or raw samples inside the installed skill folder or a shared repository. Saving locally does not mean the AI host processes the text offline.
 
 ## Gather enough evidence without a long interview
 
@@ -56,7 +58,7 @@ Save using [profile structure](references/profile-template.md), omitting unsuppo
 
 ## Write using the profile
 
-Read the appropriate person's profile, language, context mode, and current instructions. Current explicit instructions override historical preferences.
+Read the active persona's `VOICE.md`, then every `[active]` line of `learned.md`; skip `[revoked]` lines. Learned rules are applied on top of the profile. Read the language, context mode, and current instructions. Current explicit instructions override historical preferences.
 
 Extract the content that must survive: facts, names, numbers, uncertainty, commitments, links, audience, and format limits. If drafting from sparse notes, do not invent experiences or results to fill gaps.
 
@@ -66,7 +68,7 @@ Compare the draft with the source for factual fidelity, then with the profile fo
 
 ## Learn from feedback
 
-Apply edits immediately. Persist an explicit reusable preference, scoped to its language and context. For ambiguous edits, record a tentative observation rather than a global rule. A single deletion may concern content, length, or audience rather than voice.
+For edits made in the conversation, apply them immediately. For a pasted-back edited draft, the comparison, classification, and asking step live in [learning from edits](references/feedback.md); this section covers what to persist once the person has answered. Persist an explicit reusable preference, scoped to its language and context. For ambiguous edits, record a tentative observation rather than a global rule. A single deletion may concern content, length, or audience rather than voice.
 
 When preferences change, supersede the old rule and briefly record why. Accepted AI text is a reviewed example, not original human corpus. Do not infer which individual rule caused approval or invent confidence percentages.
 

@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "mmv-ui",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["ui/serve.js"],
+      "port": 4747,
+      "env": { "MATCH_MY_VOICE_PORT": "4747", "MATCH_MY_VOICE_HOME": "/tmp/mmv-scratch-home" }
+    }
+  ]
+}
