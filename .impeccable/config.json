@@ -1,0 +1,23 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "ui/index.html"
+        ],
+        "createdAt": "2026-09-22T00:37:03.538Z",
+        "reason": "agent decided: .shell is the approved Clerk/Linear app-shell (CLAUDE.md 視覺方向：一個框裡用線分三欄); each pane child carries its own 12-20px padding"
+      },
+      {
+        "rule": "overused-font",
+        "value": "inter",
+        "createdAt": "2026-09-22T00:37:24.959Z",
+        "reason": "agent decided: Operate-mode product UI; operate.md permits familiar sans; Inter only covers Latin/digits, CJK body renders in PingFang TC / Noto Sans TC"
+      }
+    ]
+  }
+}

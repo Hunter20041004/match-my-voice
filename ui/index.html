@@ -6,171 +6,246 @@
 <title>match-my-voice 口吻管理</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     /* 色 — 紫不動 */
     --bg: #F7F6FB; --surface: #FFFFFF; --surface-2: #F3F1F9; --surface-3: #E9E6F3;
-    --ink: #1A1523; --ink-2: #625C75; --ink-3: #9C96AE;
-    --accent: #6E56CF; --accent-hover: #5B45B8; --accent-ink: #FFFFFF; --danger: #E5484D;
+    --ink: #1A1523; --ink-2: #625C75; --ink-3: #6F6983;
+    --accent: #6E56CF; --accent-hover: #5B45B8; --accent-ink: #FFFFFF;
+    --accent-soft: rgba(110,86,207,.08); --accent-ring: rgba(110,86,207,.22);
+    --danger: #CC3339; --danger-hover: #B52A30; --danger-soft: rgba(204,51,57,.08);
+    --ok: #2F855A;
     /* 材質 — 髮絲線，不是陰影 */
     --hair: rgba(46,30,90,.16); --hair-soft: rgba(46,30,90,.09);
     --ring: 0 0 0 0.5px var(--hair), 0 1px 2px rgba(46,30,90,.05);
-    --ring-strong: 0 0 0 0.5px rgba(46,30,90,.24), 0 1px 2px rgba(46,30,90,.06), 0 8px 24px rgba(46,30,90,.10);
+    --ring-strong: 0 0 0 0.5px rgba(46,30,90,.24), 0 2px 4px rgba(46,30,90,.06), 0 12px 32px rgba(46,30,90,.12);
     --lit: linear-gradient(180deg, #FFFFFF 0%, #FCFBFE 100%);
     --r: 8px; --r-sm: 6px;
-    --font: -apple-system, "SF Pro Text", "PingFang TC", "Inter", "Noto Sans TC", system-ui, sans-serif;
-    --font-display: -apple-system, "SF Pro Display", "PingFang TC", "Inter", "Noto Sans TC", system-ui, sans-serif;
+    --font: "Inter", "PingFang TC", "Noto Sans TC", system-ui, -apple-system, sans-serif;
     --mono: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
     --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
     --t-fast: 140ms; --t-med: 200ms;
   }
-  html { background: var(--bg); color: var(--ink); -webkit-font-smoothing: antialiased; }
+  html { background: var(--bg); color: var(--ink); -webkit-font-smoothing: antialiased; caret-color: var(--accent); }
+  ::selection { background: rgba(110,86,207,.22); color: var(--ink); }
   body {
     font-family: var(--font) !important; font-size: 14px; line-height: 1.6;
+    font-feature-settings: "cv11", "ss01", "tnum";
     /* 極淡格線，24px */
     background-image: linear-gradient(var(--hair-soft) 0.5px, transparent 0.5px), linear-gradient(90deg, var(--hair-soft) 0.5px, transparent 0.5px);
     background-size: 24px 24px; background-position: -0.5px -0.5px;
   }
-  h1 { font-family: var(--font-display); font-weight: 500; letter-spacing: -0.025em; line-height: 1.1; text-wrap: balance; }
-  .eyebrow { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
-  .mono { font-family: var(--mono); font-size: 12px; letter-spacing: 0; }
+  body h1 { font-size: 30px; font-weight: 500; letter-spacing: -0.025em; line-height: 1.1; text-wrap: balance; }
+  @media (min-width: 768px) { body h1 { font-size: 36px; } }
+  body h3 { font-size: 18px; font-weight: 500; letter-spacing: -0.01em; }
+  body h2 { font-size: 13px; font-weight: 500; letter-spacing: -0.005em; color: var(--ink); }
+  .mono { font-family: var(--mono); font-size: 12px; letter-spacing: 0; font-variant-numeric: tabular-nums; }
+  .muted { color: var(--ink-2); } .faint { color: var(--ink-3); }
+  kbd { font-family: var(--mono); font-size: 11px; padding: 1px 5px; border-radius: 4px; background: var(--surface-2); box-shadow: var(--ring); color: var(--ink-2); }
+  code { font-family: var(--mono); font-size: 12.5px; padding: 1px 5px; border-radius: 4px; background: var(--surface-2); color: var(--ink); }
 
   /* App 殼：一個框，三欄用線隔開 */
   .shell { background: var(--lit); border-radius: var(--r); box-shadow: var(--ring); overflow: hidden; }
   .pane + .pane { border-left: 0.5px solid var(--hair-soft); }
   @media (max-width: 1023px) { .pane + .pane { border-left: 0; border-top: 0.5px solid var(--hair-soft); } }
-  .pane-head { padding: 14px 20px; border-bottom: 0.5px solid var(--hair-soft); display: flex; align-items: center; justify-content: space-between; min-height: 48px; }
+  .pane-head { padding: 12px 20px; border-bottom: 0.5px solid var(--hair-soft); display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; }
 
-  /* 按鈕：小圓角、髮絲線、13px */
+  /* 按鈕 */
   .btn { display: inline-flex; align-items: center; gap: 6px; border-radius: var(--r-sm); padding: 5px 10px;
-         font-size: 13px; font-weight: 500; line-height: 18px; cursor: pointer; white-space: nowrap;
+         font-size: 13px; font-weight: 500; line-height: 18px; cursor: pointer; white-space: nowrap; min-height: 28px;
          transition: background-color var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out), transform var(--t-fast) var(--ease-out), box-shadow var(--t-fast) var(--ease-out), opacity var(--t-fast) var(--ease-out); }
   .btn:active:not(:disabled) { transform: scale(.97); }
-  .btn:disabled { opacity: .4; cursor: default; }
+  .btn:disabled { opacity: .45; cursor: default; }
   .btn-primary { background: var(--accent); color: var(--accent-ink); box-shadow: inset 0 0 0 0.5px rgba(0,0,0,.14), inset 0 1px 0 rgba(255,255,255,.14), 0 1px 1px rgba(46,30,90,.12); }
   .btn-secondary { background: var(--surface); color: var(--ink); box-shadow: var(--ring); }
   .btn-quiet { background: transparent; color: var(--ink-2); }
+  .btn-danger { background: var(--danger); color: #fff; box-shadow: inset 0 0 0 0.5px rgba(0,0,0,.14), inset 0 1px 0 rgba(255,255,255,.14), 0 1px 1px rgba(46,30,90,.12); }
+  .btn.is-busy { pointer-events: none; }
   @media (hover: hover) and (pointer: fine) {
     .btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
     .btn-secondary:hover:not(:disabled) { background: var(--surface-2); }
     .btn-quiet:hover:not(:disabled) { background: var(--surface-2); color: var(--ink); }
-    .btn-quiet.danger:hover:not(:disabled) { color: var(--danger); background: rgba(229,72,77,.08); }
+    .btn-quiet.danger:hover:not(:disabled) { color: var(--danger); background: var(--danger-soft); }
+    .btn-danger:hover:not(:disabled) { background: var(--danger-hover); }
   }
-  .btn svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 1.75; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .btn svg, .icon { width: 14px; height: 14px; stroke: currentColor; stroke-width: 1.75; fill: none; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+  .btn-icon { padding: 5px; }
 
-  /* 角色列：列不是卡，選中 = 左側 2px 紫條 */
-  .persona { position: relative; padding: 12px 20px 12px 22px; cursor: pointer; border-bottom: 0.5px solid var(--hair-soft);
-             transition: background-color var(--t-fast) var(--ease-out); }
+  /* 角色列：選中 = 淡紫底＋名字轉紫 */
+  .persona { border-bottom: 0.5px solid var(--hair-soft); }
   .persona:last-child { border-bottom: 0; }
-  .persona::before { content: ""; position: absolute; left: 0; top: 8px; bottom: 8px; width: 2px; border-radius: 2px; background: var(--accent); opacity: 0; transition: opacity var(--t-fast) var(--ease-out); }
-  .persona.active { background: rgba(110,86,207,.06); }
-  .persona.active::before { opacity: 1; }
-  @media (hover: hover) and (pointer: fine) { .persona:hover:not(.active) { background: var(--surface-2); } }
-  .persona:focus-visible { outline: none; box-shadow: inset 0 0 0 2px rgba(110,86,207,.35); }
+  .persona-select { display: block; width: 100%; text-align: left; padding: 12px 20px 4px; cursor: pointer;
+                    transition: background-color var(--t-fast) var(--ease-out); }
+  .persona-name { font-size: 14px; font-weight: 500; overflow-wrap: anywhere; transition: color var(--t-fast) var(--ease-out); }
+  .persona.is-selected { background: var(--accent-soft); }
+  .persona.is-selected .persona-name { color: var(--accent); }
+  .persona-actions { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 0 12px 8px 20px; }
+  @media (hover: hover) and (pointer: fine) { .persona:not(.is-selected) .persona-select:hover { background: var(--surface-2); } }
+  .persona-select:focus-visible { outline: none; box-shadow: inset 0 0 0 2px var(--accent-ring); }
 
-  .chip { display: inline-flex; align-items: center; font-family: var(--mono); font-size: 10.5px; line-height: 14px; letter-spacing: .04em; padding: 2px 6px; border-radius: 4px; background: var(--surface-3); color: var(--ink-2); }
-  .chip-accent { background: rgba(110,86,207,.12); color: var(--accent); }
+  .chip { display: inline-flex; align-items: center; font-size: 11px; line-height: 16px; font-weight: 500; padding: 1px 7px; border-radius: 999px; background: var(--surface-3); color: var(--ink-2); }
+  .chip-accent { background: rgba(110,86,207,.14); color: var(--accent); }
 
-  /* 編輯區：白、髮絲線、小圓角 */
+  /* 編輯區 */
   .paper { width: 100%; min-height: 58vh; resize: vertical; padding: 18px 20px; font-family: var(--font); font-size: 14px; line-height: 1.75;
            color: var(--ink); background: var(--surface); border: 0; border-radius: var(--r-sm); outline: none; box-shadow: var(--ring);
            transition: box-shadow var(--t-med) var(--ease-out); }
-  .paper:focus { box-shadow: 0 0 0 0.5px var(--accent), 0 0 0 3px rgba(110,86,207,.18); }
+  .paper:focus { box-shadow: 0 0 0 0.5px var(--accent), 0 0 0 3px var(--accent-ring); }
   .paper::placeholder { color: var(--ink-3); }
 
   /* 規則列 */
-  .rule { padding: 14px 20px; border-bottom: 0.5px solid var(--hair-soft); transition: opacity var(--t-fast) var(--ease-out); }
+  .rule { padding: 14px 20px; border-bottom: 0.5px solid var(--hair-soft); transition: opacity var(--t-fast) var(--ease-out), background-color var(--t-fast) var(--ease-out); }
   .rule:last-child { border-bottom: 0; }
-  .rule.revoked { opacity: .5; }
+  .rule.revoked { opacity: .55; }
   .rule.revoked .rule-text { text-decoration: line-through; text-decoration-color: var(--ink-3); }
+  .rule.is-editing { background: var(--accent-soft); }
 
-  .stagger > * { opacity: 0; transform: translateY(4px); animation: rise var(--t-med) var(--ease-out) forwards; }
-  .stagger > *:nth-child(1) { animation-delay: 0ms } .stagger > *:nth-child(2) { animation-delay: 30ms }
-  .stagger > *:nth-child(3) { animation-delay: 60ms } .stagger > *:nth-child(n+4) { animation-delay: 90ms }
-  @keyframes rise { to { opacity: 1; transform: none; } }
+  /* 表單控制項 */
+  input[type="text"] { width: 100%; padding: 7px 10px; font-size: 14px; font-family: inherit; color: var(--ink); min-height: 34px;
+    background: var(--surface); border: 0; border-radius: var(--r-sm); outline: none; box-shadow: var(--ring);
+    transition: box-shadow var(--t-fast) var(--ease-out); }
+  input[type="text"]:focus { box-shadow: 0 0 0 0.5px var(--accent), 0 0 0 3px var(--accent-ring); }
+  input[type="text"][aria-invalid="true"] { box-shadow: 0 0 0 0.5px var(--danger), 0 0 0 3px var(--danger-soft); }
+  input[type="text"]::placeholder { color: var(--ink-3); }
+  .radio { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: var(--r-sm); cursor: pointer; font-size: 14px; transition: background-color var(--t-fast) var(--ease-out), box-shadow var(--t-fast) var(--ease-out); }
+  .radio:has(input:checked) { background: var(--surface-2); box-shadow: var(--ring); }
+  .radio input { accent-color: var(--accent); width: 14px; height: 14px; }
+  .field-error { color: var(--danger); font-size: 13px; }
 
-  dialog { border: 0; padding: 0; background: transparent; }
-  dialog::backdrop { background: rgba(26,21,35,.4); backdrop-filter: blur(4px); }
+  /* 名稱就地改名 */
+  .name-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 500; padding: 2px 6px; margin: -2px -6px; border-radius: 4px; cursor: text; text-align: left;
+              transition: background-color var(--t-fast) var(--ease-out); }
+  .name-btn .icon { opacity: 0; transition: opacity var(--t-fast) var(--ease-out); color: var(--ink-3); }
+  @media (hover: hover) and (pointer: fine) { .name-btn:hover { background: var(--surface-2); } .name-btn:hover .icon { opacity: 1; } }
+  .name-btn:focus-visible .icon { opacity: 1; }
+  .name-btn > span { overflow-wrap: anywhere; }
+  .name-input { font-size: 14px; font-weight: 500; padding: 2px 6px; margin: -2px -6px; min-height: 26px; width: 14em; max-width: 100%; }
+
+  /* 骨架：內容還沒到，先畫佔位條 */
+  .sk { display: block; height: 12px; border-radius: 4px; background: linear-gradient(90deg, var(--surface-2) 0%, var(--surface-3) 50%, var(--surface-2) 100%); background-size: 200% 100%; animation: shimmer 1.4s linear infinite; }
+  @keyframes shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+
+  /* 對話框：置中、從已可見的 .97 放大 */
+  dialog { border: 0; padding: 0; background: transparent; max-width: 100vw; }
+  dialog::backdrop { background: rgba(26,21,35,.42); backdrop-filter: blur(4px); }
   dialog[open] .modal { animation: pop var(--t-med) var(--ease-out); }
   .modal { background: var(--lit); border-radius: var(--r); box-shadow: var(--ring-strong); }
   @keyframes pop { from { opacity: 0; transform: scale(.97); } }
 
-  input[type="text"] { width: 100%; padding: 8px 10px; font-size: 14px; font-family: inherit; color: var(--ink);
-    background: var(--surface); border: 0; border-radius: var(--r-sm); outline: none; box-shadow: var(--ring);
-    transition: box-shadow var(--t-fast) var(--ease-out); }
-  input[type="text"]:focus { box-shadow: 0 0 0 0.5px var(--accent), 0 0 0 3px rgba(110,86,207,.18); }
-  .radio { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: var(--r-sm); cursor: pointer; font-size: 14px; transition: background-color var(--t-fast) var(--ease-out); }
-  .radio:has(input:checked) { background: var(--surface-2); box-shadow: var(--ring); }
-  .radio input { accent-color: var(--accent); width: 14px; height: 14px; }
+  /* 通知橫幅 */
+  .banner { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; border-radius: var(--r-sm); background: var(--surface); box-shadow: 0 0 0 0.5px var(--danger), 0 1px 2px rgba(46,30,90,.05); color: var(--ink); font-size: 13px; }
+
+  /* 狀態文字：換字時淡入 */
+  .status { transition: opacity var(--t-fast) var(--ease-out); }
+  .status.ok { color: var(--ok); }
+  .status.err { color: var(--danger); }
 
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
-  .btn:focus-visible, .paper:focus-visible, input:focus-visible { outline: none; }
-  .muted { color: var(--ink-2); } .faint { color: var(--ink-3); }
+  .btn:focus-visible, .paper:focus-visible, input:focus-visible, .persona-select:focus-visible { outline: none; }
+  .btn:focus-visible, input:focus-visible { box-shadow: 0 0 0 0.5px var(--accent), 0 0 0 3px var(--accent-ring); }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
-    .stagger > * { opacity: 1; transform: none; }
+    .sk { animation: none; }
   }
 </style>
 </head>
 <body class="min-h-screen">
 
-<header class="max-w-[1320px] mx-auto px-6 pt-12 pb-8">
-  <div class="eyebrow mb-3">match-my-voice</div>
-  <h1 class="text-[30px] md:text-[40px]">口吻管理<span class="muted block md:inline"><span class="hidden md:inline">　</span>Agent 寫東西前讀這裡。</span></h1>
-  <p class="mt-3 text-[14px] muted">改了就生效。這頁不叫任何 AI，只讀寫 <span class="mono">~/.config/match-my-voice/</span> 裡的檔案。</p>
+<header class="max-w-[1320px] mx-auto px-4 sm:px-6 pt-10 sm:pt-12 pb-6 sm:pb-8">
+  <h1>口吻管理</h1>
+  <p class="mt-3 text-[14px] muted max-w-[62ch]">Agent 寫東西前讀這裡；你在這裡改了，它下一次就照改後的寫。這頁不叫任何 AI，只讀寫你電腦上 <code>~/.config/match-my-voice/</code> 裡的檔案。</p>
 </header>
 
-<main class="max-w-[1320px] mx-auto px-6 pb-16">
+<main class="max-w-[1320px] mx-auto px-4 sm:px-6 pb-16">
+ <div id="load-error" class="banner mb-4 hidden" role="alert">
+   <span id="load-error-text"></span>
+   <button id="load-retry" class="btn btn-secondary">重試</button>
+ </div>
+
  <div class="shell grid lg:grid-cols-[280px_minmax(0,1fr)_360px]">
 
   <!-- 角色 -->
   <section class="pane" aria-labelledby="h-personas">
     <div class="pane-head">
-      <h2 id="h-personas" class="eyebrow">角色</h2>
-      <button id="new-persona" class="btn btn-primary">
-        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>新增
+      <h2 id="h-personas">角色</h2>
+      <button id="new-persona" class="btn btn-primary" disabled>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>新增
       </button>
     </div>
-    <ul id="persona-list" class="stagger" role="listbox" aria-label="角色清單"></ul>
-    <p id="persona-empty" class="text-[14px] muted px-5 py-6 hidden">還沒有角色。按「新增」建第一個。</p>
+    <ul id="persona-list" aria-label="角色清單"></ul>
+    <div id="persona-skeleton" class="px-5 py-4 space-y-4" aria-hidden="true">
+      <div><span class="sk w-2/3"></span><span class="sk w-1/4 mt-2.5 !h-[10px]"></span></div>
+      <div><span class="sk w-1/2"></span><span class="sk w-1/4 mt-2.5 !h-[10px]"></span></div>
+    </div>
+    <div id="persona-empty" class="px-5 py-6 hidden">
+      <p class="text-[14px] font-medium">還沒有角色。</p>
+      <p class="mt-1.5 text-[13px] muted leading-relaxed">一個角色就是一份口吻。先建一個「我自己」；代表社團或公司發言的，再另建一個。</p>
+    </div>
   </section>
 
   <!-- 口吻檔 -->
   <section class="pane min-w-0" aria-labelledby="h-profile">
     <div class="pane-head">
-      <div class="flex items-baseline gap-3"><h2 id="h-profile" class="eyebrow">口吻檔</h2><span id="profile-name" class="text-[14px] font-medium"></span></div>
-      <span class="text-[12px] faint">你看到的就是 Agent 讀到的</span>
+      <div class="flex items-center gap-3 min-w-0">
+        <h2 id="h-profile" class="shrink-0">口吻檔</h2>
+        <div id="profile-name-slot" class="min-w-0 flex-1"></div>
+      </div>
+      <span class="text-[12px] faint shrink-0 hidden sm:inline">你看到的就是 Agent 讀到的</span>
     </div>
-    <div id="profile-pane" class="p-5"><p class="text-[14px] muted">選一個角色。</p></div>
+    <div id="profile-pane" class="p-5">
+      <div class="space-y-3" aria-hidden="true"><span class="sk w-1/3"></span><span class="sk w-full"></span><span class="sk w-11/12"></span><span class="sk w-2/3"></span></div>
+    </div>
   </section>
 
   <!-- 學到的規則 -->
   <section class="pane" aria-labelledby="h-learned">
-    <div class="pane-head"><h2 id="h-learned" class="eyebrow">學到的規則</h2></div>
-    <div id="learned-pane"><p class="text-[14px] muted px-5 py-5">選一個角色。</p></div>
+    <div class="pane-head"><h2 id="h-learned">學到的規則</h2><span id="learned-count" class="text-[12px] faint"></span></div>
+    <div id="learned-pane">
+      <div class="px-5 py-5 space-y-3" aria-hidden="true"><span class="sk w-1/4 !h-[10px]"></span><span class="sk w-full"></span><span class="sk w-3/4"></span></div>
+    </div>
   </section>
  </div>
 </main>
 
-<dialog id="new-dialog">
-  <form method="dialog" id="new-form" class="modal p-6 w-[min(92vw,420px)] space-y-5">
-    <div><div class="eyebrow mb-1">新增</div><h3 class="text-[20px] font-medium tracking-tight">角色</h3></div>
+<!-- 新增角色 -->
+<dialog id="new-dialog" aria-labelledby="new-title">
+  <form method="dialog" id="new-form" class="modal p-6 w-[min(92vw,420px)] space-y-5" novalidate>
+    <div>
+      <h3 id="new-title">新增角色</h3>
+      <p class="mt-1 text-[13px] muted">一個角色一份口吻檔，互不影響。</p>
+    </div>
     <label class="block">
-      <span class="block text-[12px] muted mb-1.5">名稱</span>
-      <input type="text" name="name" required placeholder="例如：徵才月行銷長" autocomplete="off">
+      <span class="block text-[13px] muted mb-1.5">名稱</span>
+      <input type="text" name="name" required placeholder="例如：我自己、徵才月行銷長" autocomplete="off" maxlength="60">
     </label>
     <fieldset>
-      <legend class="text-[12px] muted mb-1.5">這是誰的口吻？</legend>
+      <legend class="text-[13px] muted mb-1.5">這是誰的口吻？</legend>
       <div class="space-y-1">
         <label class="radio"><input type="radio" name="type" value="self" checked><span>我自己</span></label>
         <label class="radio"><input type="radio" name="type" value="role"><span>我代表的某個角色或組織</span></label>
       </div>
     </fieldset>
-    <p id="new-error" class="text-[13px] hidden" style="color: var(--danger)" role="alert"></p>
+    <p id="new-error" class="field-error hidden" role="alert"></p>
     <div class="flex justify-end gap-2 pt-1">
       <button type="button" id="new-cancel" class="btn btn-secondary">取消</button>
-      <button type="submit" class="btn btn-primary">建立</button>
+      <button type="submit" id="new-submit" class="btn btn-primary">建立</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- 刪除確認 -->
+<dialog id="delete-dialog" aria-labelledby="delete-title">
+  <form method="dialog" id="delete-form" class="modal p-6 w-[min(92vw,420px)] space-y-5">
+    <div>
+      <h3 id="delete-title">刪除「<span id="delete-name"></span>」？</h3>
+      <p class="mt-2 text-[13px] muted leading-relaxed">口吻檔和學到的規則會一起刪掉，不能復原。如果只是學錯了幾條，回去按「撤銷」就好，不用刪整個角色。</p>
+    </div>
+    <p id="delete-error" class="field-error hidden" role="alert"></p>
+    <div class="flex justify-end gap-2 pt-1">
+      <button type="button" id="delete-cancel" class="btn btn-secondary" autofocus>留著</button>
+      <button type="submit" id="delete-submit" class="btn btn-danger">刪除</button>
     </div>
   </form>
 </dialog>
@@ -179,14 +254,18 @@
 const $ = (s) => document.querySelector(s);
 const state = { active: null, personas: [], selected: null };
 const ICON = {
-  check: '<svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>',
-  x: '<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>',
-  undo: '<svg viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-1"/></svg>',
-  pen: '<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
+  check: '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>',
+  x: '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  undo: '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-1"/></svg>',
+  pen: '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
+  star: '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1.1 5.9L12 16.9l-5.3 2.8 1.1-5.9L3.5 9.7l5.9-.8z"/></svg>',
 };
+const JSON_HEADERS = { "content-type": "application/json" };
 
 async function api(path, opts = {}) {
-  const res = await fetch(path, opts);
+  let res;
+  try { res = await fetch(path, opts); }
+  catch { throw new Error("連不上本機伺服器。終端機裡的 node ui/serve.js 還在跑嗎？"); }
   if (res.status === 204) return null;
   const type = res.headers.get("content-type") || "";
   const body = type.includes("json") ? await res.json() : await res.text();
@@ -194,13 +273,18 @@ async function api(path, opts = {}) {
   return body;
 }
 function escapeHtml(s) { return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+function busy(btn, on) { btn.disabled = on; btn.classList.toggle("is-busy", on); }
+function select(id) { state.selected = id; renderPersonas(); window.dispatchEvent(new CustomEvent("persona-selected", { detail: id })); }
 
+/* ---------- 角色 ---------- */
 async function loadPersonas() {
+  $("#load-error").classList.add("hidden");
   const data = await api("/api/personas");
   state.active = data.active; state.personas = data.personas;
   if (!state.selected || !state.personas.some(p => p.id === state.selected)) state.selected = state.active || (state.personas[0] && state.personas[0].id) || null;
-  renderPersonas();
-  window.dispatchEvent(new CustomEvent("persona-selected", { detail: state.selected }));
+  $("#persona-skeleton").classList.add("hidden");
+  $("#new-persona").disabled = false;
+  select(state.selected);
 }
 
 function renderPersonas() {
@@ -208,104 +292,220 @@ function renderPersonas() {
   $("#persona-empty").classList.toggle("hidden", state.personas.length > 0);
   for (const p of state.personas) {
     const li = document.createElement("li");
-    li.className = "persona" + (p.id === state.selected ? " active" : "");
-    li.setAttribute("role", "option"); li.setAttribute("aria-selected", p.id === state.selected); li.tabIndex = 0;
+    li.className = "persona" + (p.id === state.selected ? " is-selected" : "");
     li.innerHTML = `
-      <div class="text-[14px] font-medium break-words">${escapeHtml(p.name)}</div>
-      <div class="mt-1.5 flex items-center justify-between gap-2">
-        <div class="flex gap-1"><span class="chip">${p.type === "role" ? "ROLE" : "SELF"}</span>${p.id === state.active ? '<span class="chip chip-accent">ACTIVE</span>' : ""}</div>
-        <div class="flex gap-0 shrink-0 -mr-2">
-          ${p.id === state.active ? "" : `<button class="btn btn-quiet" data-act="activate" data-id="${p.id}">設為目前</button>`}
-          <button class="btn btn-quiet danger" data-act="delete" data-id="${p.id}" aria-label="刪除 ${escapeHtml(p.name)}">刪除</button>
-        </div>
+      <button type="button" class="persona-select" data-act="select" data-id="${p.id}" aria-pressed="${p.id === state.selected}">
+        <div class="persona-name">${escapeHtml(p.name)}</div>
+        <div class="mt-1.5 flex gap-1.5"><span class="chip">${p.type === "role" ? "角色" : "自己"}</span>${p.id === state.active ? '<span class="chip chip-accent">目前</span>' : ""}</div>
+      </button>
+      <div class="persona-actions">
+        ${p.id === state.active
+          ? `<span class="text-[12px] faint pl-0">Agent 預設用這個</span>`
+          : `<button type="button" class="btn btn-quiet -ml-2.5" data-act="activate" data-id="${p.id}">${ICON.star}設為目前</button>`}
+        <button type="button" class="btn btn-quiet danger" data-act="delete" data-id="${p.id}" aria-label="刪除 ${escapeHtml(p.name)}">刪除</button>
       </div>`;
-    const select = () => { state.selected = p.id; renderPersonas(); window.dispatchEvent(new CustomEvent("persona-selected", { detail: p.id })); };
-    li.addEventListener("click", (e) => { if (!e.target.closest("button")) select(); });
-    li.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(); } });
     ul.appendChild(li);
   }
-  ul.classList.remove("stagger"); // 只在首次載入交錯
 }
 
 $("#persona-list").addEventListener("click", async (e) => {
   const b = e.target.closest("button[data-act]"); if (!b) return;
   const id = b.dataset.id;
-  if (b.dataset.act === "activate") { await api("/api/config", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ active: id }) }); await loadPersonas(); }
-  if (b.dataset.act === "delete") {
-    const p = state.personas.find(x => x.id === id);
-    if (confirm(`刪除「${p.name}」？口吻檔和學到的規則會一起刪，不能復原。`)) { await api(`/api/personas/${encodeURIComponent(id)}`, { method: "DELETE" }); await loadPersonas(); }
+  if (b.dataset.act === "select") { if (id !== state.selected) select(id); return; }
+  if (b.dataset.act === "activate") {
+    busy(b, true);
+    try { await api("/api/config", { method: "PUT", headers: JSON_HEADERS, body: JSON.stringify({ active: id }) }); await loadPersonas(); }
+    catch (err) { busy(b, false); showLoadError(err); }
   }
+  if (b.dataset.act === "delete") openDelete(id);
 });
 
-$("#new-persona").addEventListener("click", () => { $("#new-form").reset(); $("#new-error").classList.add("hidden"); $("#new-dialog").showModal(); $("#new-form").elements.name.focus(); });
+/* 新增 */
+$("#new-persona").addEventListener("click", () => {
+  const f = $("#new-form"); f.reset(); $("#new-error").classList.add("hidden"); f.elements.name.removeAttribute("aria-invalid");
+  $("#new-dialog").showModal(); f.elements.name.focus();
+});
 $("#new-cancel").addEventListener("click", () => $("#new-dialog").close());
 $("#new-form").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const fd = new FormData(e.target);
+  const f = e.target; const name = f.elements.name.value.trim();
+  const showErr = (msg) => { $("#new-error").textContent = msg; $("#new-error").classList.remove("hidden"); f.elements.name.setAttribute("aria-invalid", "true"); f.elements.name.focus(); };
+  if (!name) return showErr("名稱不能空白。");
+  busy($("#new-submit"), true);
   try {
-    const created = await api("/api/personas", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ name: fd.get("name"), type: fd.get("type") }) });
+    const created = await api("/api/personas", { method: "POST", headers: JSON_HEADERS, body: JSON.stringify({ name, type: new FormData(f).get("type") }) });
     $("#new-dialog").close(); state.selected = created.id; await loadPersonas();
-  } catch (err) { $("#new-error").textContent = err.message; $("#new-error").classList.remove("hidden"); }
+  } catch (err) { showErr("沒建成：" + err.message); }
+  finally { busy($("#new-submit"), false); }
 });
 
+/* 刪除 */
+let deletingId = null;
+function openDelete(id) {
+  const p = state.personas.find(x => x.id === id); if (!p) return;
+  deletingId = id; $("#delete-name").textContent = p.name; $("#delete-error").classList.add("hidden");
+  $("#delete-dialog").showModal(); $("#delete-cancel").focus();
+}
+$("#delete-cancel").addEventListener("click", () => $("#delete-dialog").close());
+$("#delete-form").addEventListener("submit", async (e) => {
+  e.preventDefault(); busy($("#delete-submit"), true);
+  try { await api(`/api/personas/${encodeURIComponent(deletingId)}`, { method: "DELETE" }); $("#delete-dialog").close(); await loadPersonas(); }
+  catch (err) { $("#delete-error").textContent = "沒刪成：" + err.message; $("#delete-error").classList.remove("hidden"); }
+  finally { busy($("#delete-submit"), false); }
+});
+
+/* ---------- 名稱（就地改名） ---------- */
+function renderName(p) {
+  const slot = $("#profile-name-slot");
+  if (!p) { slot.innerHTML = ""; return; }
+  slot.innerHTML = `<button type="button" class="name-btn" id="name-btn" title="點一下改名"><span>${escapeHtml(p.name)}</span>${ICON.pen}</button>`;
+  $("#name-btn").addEventListener("click", () => editName(p));
+}
+function editName(p) {
+  const slot = $("#profile-name-slot");
+  slot.innerHTML = `<form id="name-form" class="flex items-center gap-2 min-w-0"><input type="text" class="name-input" name="name" value="${escapeHtml(p.name)}" aria-label="角色名稱" maxlength="60" autocomplete="off"><span id="name-status" class="text-[12px] faint whitespace-nowrap hidden sm:inline">Enter 存，Esc 取消</span></form>`;
+  const form = $("#name-form"); const input = form.elements.name; input.focus(); input.select();
+  let done = false;
+  const finish = () => { if (done) return; done = true; renderName(state.personas.find(x => x.id === p.id) || p); };
+  input.addEventListener("keydown", (e) => {
+    if (e.isComposing) return;   // 中文輸入法選字中的 Enter 不算
+    if (e.key === "Escape") { e.preventDefault(); finish(); }
+    if (e.key === "Enter") { e.preventDefault(); form.requestSubmit(); }
+  });
+  input.addEventListener("blur", () => { if (!done && input.value.trim() === p.name) finish(); });
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault(); const name = input.value.trim();
+    if (!name) { input.setAttribute("aria-invalid", "true"); $("#name-status").textContent = "名稱不能空白"; $("#name-status").className = "text-[12px] whitespace-nowrap field-error"; return; }
+    if (name === p.name) return finish();
+    input.disabled = true;
+    try {
+      const updated = await api(`/api/personas/${encodeURIComponent(p.id)}`, { method: "PATCH", headers: JSON_HEADERS, body: JSON.stringify({ name }) });
+      const i = state.personas.findIndex(x => x.id === p.id); if (i >= 0) state.personas[i] = { ...state.personas[i], ...updated };
+      done = true; renderPersonas(); renderName(state.personas[i] || updated);
+    } catch (err) { input.disabled = false; input.setAttribute("aria-invalid", "true"); $("#name-status").textContent = "沒存成：" + err.message; $("#name-status").className = "text-[12px] whitespace-nowrap field-error"; }
+  });
+}
+
+/* ---------- 口吻檔 ---------- */
 let profileDirty = false;
 window.addEventListener("persona-selected", async (e) => {
   const id = e.detail; const pane = $("#profile-pane");
-  if (!id) { pane.innerHTML = `<p class="text-[14px] muted">選一個角色。</p>`; $("#profile-name").textContent = ""; return; }
-  const p = state.personas.find(x => x.id === id); $("#profile-name").textContent = p.name;
-  const text = await api(`/api/personas/${encodeURIComponent(id)}/profile`);
+  const p = state.personas.find(x => x.id === id);
+  renderName(p);
+  if (!p) {
+    pane.innerHTML = `<div class="max-w-[52ch]"><p class="text-[14px] font-medium">還沒有口吻檔可看。</p><p class="mt-1.5 text-[13px] muted leading-relaxed">左邊先「新增」一個角色，然後回到跟 Agent 的對話裡說：<br><span class="text-[var(--ink)]">「用 match-my-voice 幫我建口吻檔。」</span><br>它會問你要寫什麼、去找你的樣本，整理完寫進來，你就能在這裡看到、直接改。</p></div>`;
+    return;
+  }
+  pane.innerHTML = `<div class="space-y-3" aria-hidden="true"><span class="sk w-1/3"></span><span class="sk w-full"></span><span class="sk w-11/12"></span><span class="sk w-2/3"></span></div>`;
+  let text;
+  try { text = await api(`/api/personas/${encodeURIComponent(id)}/profile`); }
+  catch (err) { pane.innerHTML = `<p class="text-[14px] field-error">讀不到口吻檔：${escapeHtml(err.message)}</p>`; return; }
+  if (state.selected !== id) return;   // 期間換了角色
   pane.innerHTML = `
-    <textarea id="profile-text" class="paper" spellcheck="false" aria-label="口吻檔內容" placeholder="還是空的。在對話裡請 Agent 用 match-my-voice 收集樣本。"></textarea>
-    <div class="flex items-center justify-between mt-4">
-      <span id="profile-status" class="mono faint" aria-live="polite"></span>
-      <button id="profile-save" class="btn btn-primary" disabled>${ICON.check}儲存</button>
+    <textarea id="profile-text" class="paper" spellcheck="false" aria-label="口吻檔內容" placeholder="還是空的。回到跟 Agent 的對話裡說「用 match-my-voice 幫我建口吻檔」，它整理完會寫進這裡。"></textarea>
+    <div class="flex items-center justify-between gap-3 mt-4">
+      <span id="profile-status" class="mono faint status" aria-live="polite"></span>
+      <div class="flex items-center gap-3">
+        <span class="text-[12px] faint hidden sm:inline"><kbd>⌘</kbd> <kbd>S</kbd></span>
+        <button id="profile-save" class="btn btn-primary" disabled>${ICON.check}儲存</button>
+      </div>
     </div>`;
   const ta = $("#profile-text"); ta.value = text; profileDirty = false;
-  const status = (t) => { $("#profile-status").textContent = t || ""; };
-  ta.addEventListener("input", () => { profileDirty = true; $("#profile-save").disabled = false; status("未儲存"); });
-  $("#profile-save").addEventListener("click", async () => {
-    $("#profile-save").disabled = true; status("儲存中…");
-    try { await api(`/api/personas/${encodeURIComponent(id)}/profile`, { method: "PUT", headers: { "content-type": "text/plain; charset=utf-8" }, body: ta.value }); profileDirty = false; status("已儲存 " + new Date().toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit" })); }
-    catch (err) { status("儲存失敗：" + err.message); $("#profile-save").disabled = false; }
-  });
+  const status = (t, cls = "") => { const el = $("#profile-status"); el.textContent = t || ""; el.className = "mono faint status " + cls; };
+  const save = async () => {
+    if (!profileDirty) return;
+    busy($("#profile-save"), true); status("儲存中…");
+    try {
+      await api(`/api/personas/${encodeURIComponent(id)}/profile`, { method: "PUT", headers: { "content-type": "text/plain; charset=utf-8" }, body: ta.value });
+      profileDirty = false; status("已儲存 " + new Date().toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit" }), "ok");
+    } catch (err) { status("儲存失敗：" + err.message, "err"); busy($("#profile-save"), false); }
+  };
+  ta.addEventListener("input", () => { profileDirty = true; $("#profile-save").disabled = false; $("#profile-save").classList.remove("is-busy"); status("未儲存"); });
+  ta.addEventListener("keydown", (e) => { if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s") { e.preventDefault(); save(); } });
+  $("#profile-save").addEventListener("click", save);
 });
 window.addEventListener("beforeunload", (e) => { if (profileDirty) { e.preventDefault(); e.returnValue = ""; } });
 
+/* ---------- 學到的規則 ---------- */
 window.addEventListener("persona-selected", async (e) => {
-  const id = e.detail; const pane = $("#learned-pane");
-  if (!id) { pane.innerHTML = `<p class="text-[14px] muted px-5 py-5">選一個角色。</p>`; return; }
+  const id = e.detail; const pane = $("#learned-pane"); $("#learned-count").textContent = "";
+  if (!id) { pane.innerHTML = `<p class="text-[13px] muted leading-relaxed px-5 py-5">有角色之後，Agent 從你的修改裡學到的規則會列在這裡。</p>`; return; }
   await renderLearned(id);
 });
 
 async function renderLearned(id) {
   const pane = $("#learned-pane");
-  const { entries } = await api(`/api/personas/${encodeURIComponent(id)}/learned`);
+  let entries;
+  try { ({ entries } = await api(`/api/personas/${encodeURIComponent(id)}/learned`)); }
+  catch (err) { pane.innerHTML = `<p class="text-[14px] field-error px-5 py-5">讀不到規則：${escapeHtml(err.message)}</p>`; return; }
+  if (state.selected !== id) return;
   const rules = entries.filter(x => x.status !== "unparsed");
-  if (!rules.length) { pane.innerHTML = `<p class="text-[14px] muted leading-relaxed px-5 py-5">還沒學到東西。<br>把改好的草稿貼回給 Agent，它會問你要不要記下來。</p>`; return; }
+  const activeCount = rules.filter(x => x.status === "active").length;
+  $("#learned-count").textContent = rules.length ? `${activeCount} 條生效` : "";
+  if (!rules.length) {
+    pane.innerHTML = `<div class="px-5 py-5 max-w-[40ch]"><p class="text-[14px] font-medium">還沒學到東西。</p><p class="mt-1.5 text-[13px] muted leading-relaxed">Agent 寫完第一版，你在自己的編輯器裡改到滿意，把整份<span class="text-[var(--ink)]">貼回給它</span>。它會比對你改了哪裡，問你哪幾條要記下來；你說好的才會出現在這裡。學錯了在這裡撤銷。</p></div>`;
+    return;
+  }
   pane.innerHTML = `<ul>${rules.map(x => `
-    <li class="rule ${x.status === "revoked" ? "revoked" : ""}">
-      <div class="mono faint mb-1.5">${x.date}<span class="mx-1.5">·</span>${escapeHtml(x.context)}${x.status === "revoked" ? '<span class="mx-1.5">·</span>REVOKED' : ""}</div>
+    <li class="rule ${x.status === "revoked" ? "revoked" : ""}" data-index="${x.index}">
+      <div class="mono faint mb-1.5">${x.date}<span class="mx-1.5">·</span>${escapeHtml(x.context)}${x.status === "revoked" ? '<span class="mx-1.5">·</span>已撤銷' : ""}</div>
       <div class="rule-text text-[14px] leading-relaxed" data-rule="${x.index}">${escapeHtml(x.rule)}</div>
       <div class="mono faint mt-1.5">← ${escapeHtml(x.source)}</div>
-      <div class="flex gap-0 mt-2 -ml-2">
-        <button class="btn btn-quiet" data-act="edit" data-i="${x.index}">${ICON.pen}改字</button>
-        <button class="btn btn-quiet ${x.status === "active" ? "danger" : ""}" data-act="toggle" data-i="${x.index}" data-next="${x.status === "active" ? "revoked" : "active"}">${x.status === "active" ? ICON.x + "撤銷" : ICON.undo + "恢復"}</button>
+      <div class="flex gap-0 mt-2 -ml-2.5">
+        <button type="button" class="btn btn-quiet" data-act="edit" data-i="${x.index}">${ICON.pen}改字</button>
+        <button type="button" class="btn btn-quiet ${x.status === "active" ? "danger" : ""}" data-act="toggle" data-i="${x.index}" data-next="${x.status === "active" ? "revoked" : "active"}">${x.status === "active" ? ICON.x + "撤銷" : ICON.undo + "恢復"}</button>
       </div>
     </li>`).join("")}</ul>`;
   pane.onclick = async (ev) => {
     const b = ev.target.closest("button[data-act]"); if (!b) return;
     const i = Number(b.dataset.i);
-    if (b.dataset.act === "toggle") { await api(`/api/personas/${encodeURIComponent(id)}/learned/${i}`, { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ status: b.dataset.next }) }); await renderLearned(id); }
-    if (b.dataset.act === "edit") {
-      const cur = pane.querySelector(`[data-rule="${i}"]`).textContent;
-      const next = prompt("改成：", cur); if (next === null || next.trim() === cur) return;
-      try { await api(`/api/personas/${encodeURIComponent(id)}/learned/${i}`, { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ rule: next }) }); await renderLearned(id); }
-      catch (err) { alert("沒存成：" + err.message); }
+    if (b.dataset.act === "toggle") {
+      busy(b, true);
+      try { await api(`/api/personas/${encodeURIComponent(id)}/learned/${i}`, { method: "PATCH", headers: JSON_HEADERS, body: JSON.stringify({ status: b.dataset.next }) }); await renderLearned(id); }
+      catch (err) { busy(b, false); showLoadError(err); }
     }
+    if (b.dataset.act === "edit") editRule(id, i);
   };
 }
 
-loadPersonas().catch((err) => { $("#persona-empty").textContent = "讀取失敗：" + err.message; $("#persona-empty").classList.remove("hidden"); });
+function editRule(id, i) {
+  const li = $(`#learned-pane li[data-index="${i}"]`); if (!li || li.classList.contains("is-editing")) return;
+  const textEl = li.querySelector(`[data-rule="${i}"]`); const cur = textEl.textContent;
+  const actions = li.querySelector(".flex.gap-0");
+  li.classList.add("is-editing");
+  textEl.innerHTML = `<form class="space-y-2" id="rule-form-${i}"><input type="text" name="rule" value="${escapeHtml(cur)}" aria-label="規則內容" autocomplete="off"><p class="field-error hidden" role="alert"></p><div class="flex gap-2"><button type="submit" class="btn btn-primary">${ICON.check}存</button><button type="button" class="btn btn-secondary" data-cancel>取消</button></div></form>`;
+  actions.classList.add("hidden");
+  const form = textEl.querySelector("form"); const input = form.elements.rule; const errEl = form.querySelector("p"); input.focus(); input.setSelectionRange(input.value.length, input.value.length);
+  const cancel = () => { textEl.textContent = cur; actions.classList.remove("hidden"); li.classList.remove("is-editing"); };
+  form.querySelector("[data-cancel]").addEventListener("click", cancel);
+  input.addEventListener("keydown", (e) => {
+    if (e.isComposing) return;
+    if (e.key === "Escape") { e.preventDefault(); cancel(); }
+    if (e.key === "Enter") { e.preventDefault(); form.requestSubmit(); }
+  });
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault(); const next = input.value.trim();
+    const fail = (m) => { errEl.textContent = m; errEl.classList.remove("hidden"); input.setAttribute("aria-invalid", "true"); input.focus(); };
+    if (!next) return fail("規則不能空白。");
+    if (next.includes("|")) return fail("規則裡不能有「|」，那是檔案的分隔符號。");
+    if (next === cur) return cancel();
+    busy(form.querySelector("[type=submit]"), true);
+    try { await api(`/api/personas/${encodeURIComponent(id)}/learned/${i}`, { method: "PATCH", headers: JSON_HEADERS, body: JSON.stringify({ rule: next }) }); await renderLearned(id); }
+    catch (err) { busy(form.querySelector("[type=submit]"), false); fail("沒存成：" + err.message); }
+  });
+}
+
+/* ---------- 錯誤橫幅 ---------- */
+function showLoadError(err) { $("#load-error-text").textContent = err.message; $("#load-error").classList.remove("hidden"); }
+$("#load-retry").addEventListener("click", () => boot());
+function boot() {
+  loadPersonas().catch((err) => {
+    $("#persona-skeleton").classList.add("hidden");
+    $("#profile-pane").innerHTML = ""; $("#learned-pane").innerHTML = "";
+    showLoadError(err);
+  });
+}
+boot();
 </script>
 </body>
 </html>

@@ -94,6 +94,17 @@ export function deletePersona(home, id) {
   return true;
 }
 
+export function renamePersona(home, id, change) {
+  const dir = personaDir(home, id);
+  if (!dir) throw Object.assign(new Error("not found"), { status: 404 });
+  if (!("name" in change) || Object.keys(change).some((k) => k !== "name")) throw Object.assign(new Error("only name can be changed"), { status: 400 });
+  const cleanName = String(change.name ?? "").trim();
+  if (!cleanName) throw Object.assign(new Error("name required"), { status: 400 });
+  const meta = { ...readJson(join(dir, "persona.json"), {}), name: cleanName };
+  writeFileSync(join(dir, "persona.json"), JSON.stringify(meta, null, 2));
+  return { id, ...meta };
+}
+
 export function getConfig(home) { ensureHome(home); return readJson(join(home, "config.json"), { active: null }); }
 
 export function setActive(home, id) {
@@ -190,6 +201,7 @@ export function createApp(home) {
       if (req.method === "DELETE" && del) {
         return deletePersona(home, decodeURIComponent(del[1])) ? send(res, 204, "") : send(res, 404, { error: "not found" });
       }
+      if (req.method === "PATCH" && del) return send(res, 200, renamePersona(home, decodeURIComponent(del[1]), await readBody(req)));
       return send(res, 404, { error: "not found" });
     } catch (err) {
       return send(res, err.status || 500, { error: String(err.message || err) });
