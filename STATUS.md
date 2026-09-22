@@ -1,6 +1,6 @@
 # STATUS — match-my-voice
 
-更新：2026-09-22
+更新：2026-09-22（下午）
 
 ## 這是什麼
 
@@ -26,7 +26,7 @@
 | 東西 | 用什麼 | 怎麼驗 |
 |---|---|---|
 | 技能文件 `SKILL.md`、`references/*.md` | Markdown，英文 | `python3 -m unittest discover -s tests -q`（21 條契約測試） |
-| 管理頁面 `ui/serve.js`、`ui/index.html` | Node ≥ 18 內建模組、單檔 HTML＋Tailwind CDN | `node --test tests/ui/*.test.js`（10 條，真實臨時資料夾） |
+| 管理頁面 `ui/serve.js`、`ui/index.html` | Node ≥ 18 內建模組、單檔 HTML＋Tailwind CDN | `node --test tests/ui/*.test.js`（11 條，真實臨時資料夾） |
 | 儲存 | `~/.config/match-my-voice/config.json`、`profiles/<id>/{persona.json,VOICE.md,learned.md}` | — |
 
 安裝：`git clone` 到 `~/.claude/skills/match-my-voice`（本機是符號連結指到 `~/Developer/match-my-voice`）。零 npm 套件。
@@ -43,10 +43,12 @@
 | 09-21 | 研究報告：沒有 Spotify 式突破 | 六個候選差異化底層技術都已存在；價值在組合與定位 |
 | 09-21 | 視覺：紫羅蘭主色、Clerk／Linear 材質 | 使用者三輪回饋：太簡陋 → 太 AI → 看 YC 公司怎麼做 |
 | 09-22 | 搬進 `~/Developer/`，技能路徑改符號連結 | 它已經是產品不是技能 |
+| 09-22 | 介面主要使用者定為「從 GitHub 裝技能的所有人」（寫進 `PRODUCT.md`） | 決定空狀態要指路、不預設使用者知道流程 |
+| 09-22 | 介面第四輪：用 impeccable／Emil 規範重做執行，方向不變 | 拿掉原生 prompt/confirm、開場動畫、eyebrow 小標；補骨架、空狀態、就地改名／改字 |
 
 ## 目前進度
 
-- `main` `ef49dcc`：v3 完整（角色＋反哺說明書＋介面）＋三輪視覺。契約 21、伺服器 10 全綠。
+- `main`：v3 完整（角色＋反哺說明書＋介面）＋四輪視覺。契約 21、伺服器 11 全綠。
 - 使用者自己的 `profiles/default/VOICE.md`（9-04 建、9-17 改過）已自動遷移成 `self` 角色，內容沒動。
 - 對外：GitHub public、MIT、0 star、無 topics、沒提交任何技能目錄。
 
@@ -55,14 +57,12 @@
 1. **觸發不確定**：使用者說「幫我寫求職信」沒提口吻，技能可能不被叫出來。沒實測。最要命。
 2. **反哺要使用者自己記得貼回來**，沒東西提醒。
 3. **頁面跟對話斷開**：頁面另開，Agent 不知道它開在哪。
-4. 遷移後角色叫「default」，頁面沒改名功能。
-5. **效果沒驗證**：口吻檔分析、反哺分類都沒校準過——研究報告說這是「沒校準的儀器」。
-6. Codex 的 `agents/openai.yaml` 預設提示沒跟上角色。
-7. Windows 沒測。
+4. **效果沒驗證**：口吻檔分析、反哺分類都沒校準過——研究報告說這是「沒校準的儀器」。
+5. Codex 的 `agents/openai.yaml` 預設提示沒跟上角色。
+6. Windows 沒測。
 
 ## 下一步
 
 - **v4 = 校準儀器**（研究報告前三項）：`tools/stylometry.js` 純規則文體計量（字元 n-gram、功能字、句末助詞、全形標點、句長）；`compare` 出每特徵 z-score＋三態；`calibrate` 拿已知作者驗證分不分得出來。數值另存機器檔，`VOICE.md` 只放自動產生的摘要段。
 - 校準資料**待使用者拍板**：建議「使用者的 5 份 PDF＋這場對話」當正樣本、「AI 寫的同題自傳＋徵才月貼文」當負樣本。
 - 補洞 1（改 description 讓「幫我寫 X」也觸發，實測）。
-- 第一次再碰 UI 時，依全域規則用 `/impeccable init` 建 `PRODUCT.md`。

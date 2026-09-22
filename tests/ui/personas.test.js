@@ -105,3 +105,22 @@ test("DELETE /api/personas/:id removes it and clears active if needed", async ()
     } finally { await app.close(); }
   } finally { cleanup(); }
 });
+
+test("PATCH /api/personas/:id renames the display name only; id and files stay", async () => {
+  const { dir, cleanup } = tempHome();
+  try {
+    seedPersona(dir, "default", { name: "default", type: "self", voice: "# keep me\n" });
+    const app = await startApp(dir);
+    try {
+      const patch = (id, body) => fetch(`${app.base}/api/personas/${id}`, { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+      const ok = await patch("default", { name: "我自己" });
+      assert.equal(ok.status, 200);
+      assert.deepEqual(await ok.json(), { id: "default", name: "我自己", type: "self", created: JSON.parse(readFileSync(join(dir, "profiles", "default", "persona.json"), "utf8")).created });
+      assert.equal(JSON.parse(readFileSync(join(dir, "profiles", "default", "persona.json"), "utf8")).name, "我自己");
+      assert.equal(readFileSync(join(dir, "profiles", "default", "VOICE.md"), "utf8"), "# keep me\n", "VOICE.md untouched");
+      assert.equal((await patch("default", { name: "   " })).status, 400);
+      assert.equal((await patch("nope", { name: "x" })).status, 404);
+      assert.equal((await patch("default", { type: "role" })).status, 400, "type is not renameable here");
+    } finally { await app.close(); }
+  } finally { cleanup(); }
+});

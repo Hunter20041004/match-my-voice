@@ -41,7 +41,7 @@ repo 在 `~/Developer/match-my-voice/`。`~/.claude/skills/match-my-voice` 是�
 
 ```bash
 python3 -m unittest discover -s tests -q      # 契約測試（21 條）
-node --test tests/ui/*.test.js                 # 伺服器測試（10 條，用真實臨時資料夾）
+node --test tests/ui/*.test.js                 # 伺服器測試（11 條，用真實臨時資料夾）
 ```
 
 兩套都要綠才算過。紅綠循環只跑當前那一條；任務收尾跑全套；合併回 `main` 前再跑一次。
@@ -56,6 +56,7 @@ node --test tests/ui/*.test.js                 # 伺服器測試（10 條，用�
 紫羅蘭主色（Radix Violet 9 `#6E56CF`）、淡紫底 `#F7F6FB`。材質參考 Clerk／Linear：0.5px 髮絲線取代陰影、圓角 8、
 標題字重 500 字距 -2.5%、等寬字當小標籤與日期、24px 極淡格線底、一個框裡用線分三欄。所有代幣在 `ui/index.html` 的 `:root`。
 改 UI 前後各截桌機 1280×800 與手機 375×812，逐項自評八項。
+設計脈絡在根目錄 `PRODUCT.md`（impeccable 的產品說明卡）；偵測例外記在 `.impeccable/config.json`，每條都有理由。
 
 ## 交件
 
